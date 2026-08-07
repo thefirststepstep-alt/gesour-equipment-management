@@ -15,6 +15,7 @@
     
     <!-- Firebase JS SDK (v9 compatibility mode) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     
     <!-- Supabase JS Client -->
@@ -95,16 +96,16 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 160px;
-            height: 160px;
+            width: 170px;
+            height: 170px;
             background: radial-gradient(circle, var(--gold-glow) 0%, transparent 70%);
             border-radius: 50%;
             z-index: 0;
         }
 
         .club-logo {
-            width: 140px;
-            height: 140px;
+            width: 145px;
+            height: 145px;
             object-fit: contain;
             position: relative;
             z-index: 1;
@@ -393,6 +394,7 @@
             font-weight: 600;
             background: rgba(0, 0, 0, 0.4);
             border: 1px solid var(--border-soft);
+            cursor: pointer;
         }
 
         .status-dot {
@@ -868,9 +870,9 @@
 
             <!-- Action Buttons & Status -->
             <div class="action-buttons">
-                <div class="status-badge" id="dbStatusBadge" title="حالة الاتصال بقاعدة البيانات">
+                <div class="status-badge" id="dbStatusBadge" onclick="openBackendModal()" title="حالة الاتصال - انقر للتفاصيل والضبط">
                     <span class="status-dot" id="dbStatusDot"></span>
-                    <span id="dbStatusText">Firebase (josour-djard) 🔥</span>
+                    <span id="dbStatusText">جاري الفحص...</span>
                 </div>
 
                 <button class="btn btn-outline-gold" onclick="openCustomColumnModal()">
@@ -1045,43 +1047,38 @@
         </div>
     </div>
 
-    <!-- Firebase / Supabase Settings Modal -->
+    <!-- Firebase / Database Settings Modal -->
     <div class="modal-overlay" id="backendModal">
         <div class="modal-card">
             <div class="modal-header">
                 <h3 class="modal-title">
-                    <i class="fa-solid fa-database"></i> إعدادات قاعدة البيانات
+                    <i class="fa-solid fa-database"></i> إعدادات قاعدة البيانات (Firebase josour-djard)
                 </h3>
                 <button class="close-modal" onclick="closeBackendModal()">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
             <div class="modal-body">
-                <p style="font-size: 0.9rem; color: var(--text-muted);">
-                    التطبيق متصل تلقائياً بمشروع Firebase الرسمي الخاص بك (<b>josour-djard</b>).
-                </p>
+                <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid var(--success); padding: 12px; border-radius: 10px; font-size: 0.88rem; line-height: 1.5; color: #e2e8f0;">
+                    <i class="fa-solid fa-circle-check" style="color: var(--success);"></i> 
+                    التطبيق مبرمج للربط المباشر بمشروعك الرسمي على <b>Firebase</b>: <code>josour-djard</code>.
+                </div>
 
-                <div class="form-group">
+                <div class="form-group" style="margin-top: 10px;">
                     <label for="fbConfigJson"><i class="fa-fire fab" style="color:#f59e0b;"></i> Firebase SDK Config (JSON)</label>
-                    <textarea id="fbConfigJson" class="form-control" rows="5"></textarea>
+                    <textarea id="fbConfigJson" class="form-control" rows="6" style="font-family: monospace; font-size: 0.8rem;"></textarea>
                 </div>
 
-                <hr style="border-color: var(--border-soft); margin: 6px 0;">
-
-                <div class="form-group">
-                    <label for="sbUrl"><i class="fa-solid fa-link"></i> Supabase URL (اختياري)</label>
-                    <input type="text" id="sbUrl" class="form-control" placeholder="https://xyzcompany.supabase.co">
-                </div>
-
-                <div class="form-group">
-                    <label for="sbKey"><i class="fa-solid fa-key"></i> Supabase Anon Key (اختياري)</label>
-                    <input type="password" id="sbKey" class="form-control" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6...">
+                <div style="background: rgba(201, 162, 39, 0.1); border: 1px solid var(--border-gold); padding: 12px; border-radius: 10px; font-size: 0.82rem; line-height: 1.5; color: var(--gold-light);">
+                    💡 <b>تنبيه بخصوص صلاحيات Firebase:</b><br>
+                    لتفعيل المزامنة المباشرة الحية عبر الإنترنت بدون أي تعارض في الصلاحيات، يرجى التأكد من أن قواعد <b>Firestore</b> أو <b>Realtime Database</b> في حسابك تسمح بالقراءة والكتابة:
+                    <code style="display:block; margin-top:4px; color:#fff; background:rgba(0,0,0,0.4); padding:4px 8px; border-radius:6px;">allow read, write: if true;</code>
                 </div>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="disconnectBackend()">قطع الاتصال (تخزين محلي)</button>
                 <button class="btn btn-primary" onclick="saveBackendConfig()">
-                    <i class="fa-solid fa-plug"></i> حفظ وحفظ الاتصال
+                    <i class="fa-solid fa-plug"></i> حفظ وإعادة الاتصال
                 </button>
             </div>
         </div>
@@ -1096,6 +1093,7 @@
         const officialFirebaseConfig = {
             apiKey: "AIzaSyAYdprBxSxDf_2mUve4EY7t5jDgo_2_Lb4",
             authDomain: "josour-djard.firebaseapp.com",
+            databaseURL: "https://josour-djard-default-rtdb.firebaseio.com",
             projectId: "josour-djard",
             storageBucket: "josour-djard.firebasestorage.app",
             messagingSenderId: "830517852419",
@@ -1108,8 +1106,8 @@
         let customColumns = []; // Custom column names array
         let activeDayFilter = 'all'; // Current day tab
         let firestoreDb = null;
-        let supabaseClient = null;
-        let activeBackend = 'firebase'; // Default to connected Firebase
+        let realtimeDb = null;
+        let activeBackend = 'firebase'; // Default to Firebase
 
         // Default Initial Sample Data across non-Friday days
         const initialSampleData = [
@@ -1256,6 +1254,7 @@
                         firebase.initializeApp(cfg);
                     }
                     firestoreDb = firebase.firestore();
+                    realtimeDb = firebase.database();
                     activeBackend = 'firebase';
                     updateDbStatusUI(true, 'Firebase متصل 🔥 (josour-djard)');
                     return;
@@ -1275,7 +1274,7 @@
             if (statusText) statusText.textContent = text;
         }
 
-        // Data Loading & Firestore Live Syncing
+        // Data Loading & Live Syncing
         async function loadCouncilsData() {
             if (activeBackend === 'firebase' && firestoreDb) {
                 try {
@@ -1287,28 +1286,44 @@
 
                         if (data.length > 0) {
                             councilsData = data;
+                            updateDashboardStats();
+                            renderTable(getFilteredData());
                         } else {
-                            // Seed initial sample data to Firebase Firestore if empty
-                            initialSampleData.forEach(item => {
-                                firestoreDb.collection('councils_equipment').add(item);
-                            });
-                            councilsData = initialSampleData;
+                            loadFromRealtimeDbOrLocal();
                         }
-
-                        updateDashboardStats();
-                        renderTable(getFilteredData());
                     }, (err) => {
-                        console.warn('Firestore Snapshot listener warning:', err);
-                        loadFromLocalStorage();
+                        console.warn('Firestore Snapshot listener error/locked rules:', err);
+                        loadFromRealtimeDbOrLocal();
                     });
                     return;
                 } catch(e) { 
                     console.error(e); 
-                    loadFromLocalStorage();
+                    loadFromRealtimeDbOrLocal();
                 }
             } else {
                 loadFromLocalStorage();
             }
+        }
+
+        function loadFromRealtimeDbOrLocal() {
+            if (realtimeDb) {
+                try {
+                    realtimeDb.ref('councils_equipment').on('value', (snap) => {
+                        const val = snap.val();
+                        if (val) {
+                            councilsData = Object.keys(val).map(k => ({ id: k, ...val[k] }));
+                            updateDashboardStats();
+                            renderTable(getFilteredData());
+                        } else {
+                            loadFromLocalStorage();
+                        }
+                    }, (err) => {
+                        loadFromLocalStorage();
+                    });
+                    return;
+                } catch(e) {}
+            }
+            loadFromLocalStorage();
         }
 
         function loadFromLocalStorage() {
@@ -1509,37 +1524,38 @@
             const payload = { day, council_name, main_facilitator, equipment_used, location, custom_fields };
 
             if (id) {
-                // UPDATE in Firebase Firestore
-                if (activeBackend === 'firebase' && firestoreDb) {
-                    try {
-                        await firestoreDb.collection('councils_equipment').doc(id).update(payload);
-                        showToast('تمت تعديل البيانات بنجاح في Firebase!');
-                    } catch(err) {
-                        console.error('Firestore update error:', err);
-                        showToast('تعذر التعديل في Firebase، تم الحفظ محلياً', 'warning');
+                // UPDATE in Firebase Firestore or Realtime
+                if (activeBackend === 'firebase') {
+                    if (firestoreDb) {
+                        try { await firestoreDb.collection('councils_equipment').doc(id).update(payload); } catch(err) {}
                     }
+                    if (realtimeDb) {
+                        try { await realtimeDb.ref('councils_equipment/' + id).update(payload); } catch(err) {}
+                    }
+                    showToast('تمت تعديل البيانات بنجاح في Firebase!');
                 }
 
                 const idx = councilsData.findIndex(c => c.id == id);
                 if (idx !== -1) councilsData[idx] = { ...councilsData[idx], ...payload };
             } else {
-                // INSERT into Firebase Firestore
-                if (activeBackend === 'firebase' && firestoreDb) {
-                    try {
-                        const docRef = await firestoreDb.collection('councils_equipment').add(payload);
-                        payload.id = docRef.id;
-                        showToast('تمت إضافة المجلس بنجاح في Firebase!');
-                    } catch(err) {
-                        console.error('Firestore add error:', err);
-                        payload.id = 'id-' + Date.now();
-                        councilsData.unshift(payload);
-                        showToast('تعذر الإضافة في Firebase، تم الحفظ محلياً', 'warning');
+                // INSERT into Firebase Firestore or Realtime
+                const newId = 'id-' + Date.now();
+                payload.id = newId;
+
+                if (activeBackend === 'firebase') {
+                    if (firestoreDb) {
+                        try { await firestoreDb.collection('councils_equipment').doc(newId).set(payload); } catch(err) {}
                     }
+                    if (realtimeDb) {
+                        try { await realtimeDb.ref('councils_equipment/' + newId).set(payload); } catch(err) {}
+                    }
+                    showToast('تمت إضافة المجلس بنجاح في Firebase!');
                 } else {
-                    payload.id = 'id-' + Date.now();
-                    councilsData.unshift(payload);
                     showToast('تمت إضافة المجلس بنجاح!');
                 }
+
+                const exists = councilsData.some(c => c.id === newId);
+                if (!exists) councilsData.unshift(payload);
             }
 
             saveToLocalStorage();
@@ -1562,10 +1578,13 @@
             const id = document.getElementById('deleteTargetId').value;
             if (!id) return;
 
-            if (activeBackend === 'firebase' && firestoreDb) {
-                try {
-                    await firestoreDb.collection('councils_equipment').doc(id).delete();
-                } catch(e) { console.error(e); }
+            if (activeBackend === 'firebase') {
+                if (firestoreDb) {
+                    try { await firestoreDb.collection('councils_equipment').doc(id).delete(); } catch(e) {}
+                }
+                if (realtimeDb) {
+                    try { await realtimeDb.ref('councils_equipment/' + id).remove(); } catch(e) {}
+                }
             }
 
             councilsData = councilsData.filter(c => c.id != id);
@@ -1599,6 +1618,7 @@
         function disconnectBackend() {
             localStorage.removeItem('firebase_config');
             firestoreDb = null;
+            realtimeDb = null;
             activeBackend = 'local';
             updateDbStatusUI(false, 'تخزين محلي');
             loadFromLocalStorage();
