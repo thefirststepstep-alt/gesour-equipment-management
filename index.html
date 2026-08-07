@@ -15,7 +15,7 @@
     
     <!-- Firebase JS SDK (v9 compatibility mode) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     
     <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -103,8 +103,8 @@
         }
 
         .club-logo {
-            width: 135px;
-            height: 135px;
+            width: 140px;
+            height: 140px;
             object-fit: contain;
             position: relative;
             z-index: 1;
@@ -870,7 +870,7 @@
             <div class="action-buttons">
                 <div class="status-badge" id="dbStatusBadge" title="حالة الاتصال بقاعدة البيانات">
                     <span class="status-dot" id="dbStatusDot"></span>
-                    <span id="dbStatusText">تخزين محلي</span>
+                    <span id="dbStatusText">Firebase (josour-djard) 🔥</span>
                 </div>
 
                 <button class="btn btn-outline-gold" onclick="openCustomColumnModal()">
@@ -878,7 +878,7 @@
                 </button>
 
                 <button class="btn btn-secondary" onclick="openBackendModal()">
-                    <i class="fa-solid fa-database"></i> الربط (Firebase / Supabase)
+                    <i class="fa-solid fa-database"></i> إعدادات الربط
                 </button>
 
                 <button class="btn btn-primary" onclick="openAddModal()">
@@ -1050,7 +1050,7 @@
         <div class="modal-card">
             <div class="modal-header">
                 <h3 class="modal-title">
-                    <i class="fa-solid fa-database"></i> إعدادات قاعدة البيانات (Firebase / Supabase)
+                    <i class="fa-solid fa-database"></i> إعدادات قاعدة البيانات
                 </h3>
                 <button class="close-modal" onclick="closeBackendModal()">
                     <i class="fa-solid fa-xmark"></i>
@@ -1058,30 +1058,30 @@
             </div>
             <div class="modal-body">
                 <p style="font-size: 0.9rem; color: var(--text-muted);">
-                    يمكنك ربط التطبيق بقاعدة بيانات Firebase Realtime / Firestore أو Supabase لتخزين البيانات بشكل دائم وتلقائي.
+                    التطبيق متصل تلقائياً بمشروع Firebase الرسمي الخاص بك (<b>josour-djard</b>).
                 </p>
 
                 <div class="form-group">
                     <label for="fbConfigJson"><i class="fa-fire fab" style="color:#f59e0b;"></i> Firebase SDK Config (JSON)</label>
-                    <textarea id="fbConfigJson" class="form-control" placeholder='{ "apiKey": "...", "authDomain": "...", "databaseURL": "...", "projectId": "..." }' rows="4"></textarea>
+                    <textarea id="fbConfigJson" class="form-control" rows="5"></textarea>
                 </div>
 
                 <hr style="border-color: var(--border-soft); margin: 6px 0;">
 
                 <div class="form-group">
-                    <label for="sbUrl"><i class="fa-solid fa-link"></i> Supabase URL</label>
+                    <label for="sbUrl"><i class="fa-solid fa-link"></i> Supabase URL (اختياري)</label>
                     <input type="text" id="sbUrl" class="form-control" placeholder="https://xyzcompany.supabase.co">
                 </div>
 
                 <div class="form-group">
-                    <label for="sbKey"><i class="fa-solid fa-key"></i> Supabase Anon Key</label>
+                    <label for="sbKey"><i class="fa-solid fa-key"></i> Supabase Anon Key (اختياري)</label>
                     <input type="password" id="sbKey" class="form-control" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6...">
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="disconnectBackend()">قطع الاتصال (استخدام المحترس المحلي)</button>
+                <button class="btn btn-secondary" onclick="disconnectBackend()">قطع الاتصال (تخزين محلي)</button>
                 <button class="btn btn-primary" onclick="saveBackendConfig()">
-                    <i class="fa-solid fa-plug"></i> حفظ واختبار الاتصال
+                    <i class="fa-solid fa-plug"></i> حفظ وحفظ الاتصال
                 </button>
             </div>
         </div>
@@ -1092,13 +1092,24 @@
 
     <!-- Application Script -->
     <script>
+        // Official Firebase Project Credentials (josour-djard)
+        const officialFirebaseConfig = {
+            apiKey: "AIzaSyAYdprBxSxDf_2mUve4EY7t5jDgo_2_Lb4",
+            authDomain: "josour-djard.firebaseapp.com",
+            projectId: "josour-djard",
+            storageBucket: "josour-djard.firebasestorage.app",
+            messagingSenderId: "830517852419",
+            appId: "1:830517852419:web:80eb5c821346aedc63d136",
+            measurementId: "G-B1VH7QBJHP"
+        };
+
         // Application State
         let councilsData = [];
         let customColumns = []; // Custom column names array
         let activeDayFilter = 'all'; // Current day tab
-        let firebaseDb = null;
+        let firestoreDb = null;
         let supabaseClient = null;
-        let activeBackend = 'local'; // 'firebase' | 'supabase' | 'local'
+        let activeBackend = 'firebase'; // Default to connected Firebase
 
         // Default Initial Sample Data across non-Friday days
         const initialSampleData = [
@@ -1183,7 +1194,6 @@
 
         function renderTableHeader() {
             const headerRow = document.getElementById('tableHeaderRow');
-            // Remove previous custom th if any
             const existingCustomThs = headerRow.querySelectorAll('.dynamic-th');
             existingCustomThs.forEach(th => th.remove());
 
@@ -1233,38 +1243,24 @@
             }
         }
 
-        // Backend Initialization (Firebase / Supabase / Local)
+        // Initialize Direct Connection to Firebase (josour-djard)
         function initBackendClient() {
-            const fbConfig = localStorage.getItem('firebase_config');
-            const sbUrl = localStorage.getItem('supabase_url');
-            const sbKey = localStorage.getItem('supabase_key');
+            const savedFbConfig = localStorage.getItem('firebase_config');
+            const cfg = savedFbConfig ? JSON.parse(savedFbConfig) : officialFirebaseConfig;
+            
+            document.getElementById('fbConfigJson').value = JSON.stringify(cfg, null, 2);
 
-            if (fbConfig && window.firebase) {
+            if (window.firebase) {
                 try {
-                    const parsed = JSON.parse(fbConfig);
                     if (!firebase.apps.length) {
-                        firebase.initializeApp(parsed);
+                        firebase.initializeApp(cfg);
                     }
-                    firebaseDb = firebase.database();
+                    firestoreDb = firebase.firestore();
                     activeBackend = 'firebase';
-                    updateDbStatusUI(true, 'Firebase متصل 🔥');
-                    document.getElementById('fbConfigJson').value = fbConfig;
+                    updateDbStatusUI(true, 'Firebase متصل 🔥 (josour-djard)');
                     return;
                 } catch(e) {
                     console.error('Firebase init error:', e);
-                }
-            }
-
-            if (sbUrl && sbKey && window.supabase) {
-                try {
-                    supabaseClient = window.supabase.createClient(sbUrl, sbKey);
-                    activeBackend = 'supabase';
-                    updateDbStatusUI(true, 'Supabase متصل ⚡');
-                    document.getElementById('sbUrl').value = sbUrl;
-                    document.getElementById('sbKey').value = sbKey;
-                    return;
-                } catch (e) {
-                    console.error('Supabase init error:', e);
                 }
             }
 
@@ -1279,40 +1275,40 @@
             if (statusText) statusText.textContent = text;
         }
 
-        // Data Loading & Syncing
+        // Data Loading & Firestore Live Syncing
         async function loadCouncilsData() {
-            if (activeBackend === 'firebase' && firebaseDb) {
+            if (activeBackend === 'firebase' && firestoreDb) {
                 try {
-                    firebaseDb.ref('councils_equipment').on('value', (snapshot) => {
-                        const val = snapshot.val();
-                        if (val) {
-                            councilsData = Object.keys(val).map(k => ({ id: k, ...val[k] }));
+                    firestoreDb.collection('councils_equipment').onSnapshot((snapshot) => {
+                        const data = [];
+                        snapshot.forEach(doc => {
+                            data.push({ id: doc.id, ...doc.data() });
+                        });
+
+                        if (data.length > 0) {
+                            councilsData = data;
                         } else {
-                            councilsData = [];
+                            // Seed initial sample data to Firebase Firestore if empty
+                            initialSampleData.forEach(item => {
+                                firestoreDb.collection('councils_equipment').add(item);
+                            });
+                            councilsData = initialSampleData;
                         }
+
                         updateDashboardStats();
                         renderTable(getFilteredData());
+                    }, (err) => {
+                        console.warn('Firestore Snapshot listener warning:', err);
+                        loadFromLocalStorage();
                     });
                     return;
-                } catch(e) { console.error(e); }
+                } catch(e) { 
+                    console.error(e); 
+                    loadFromLocalStorage();
+                }
+            } else {
+                loadFromLocalStorage();
             }
-
-            if (activeBackend === 'supabase' && supabaseClient) {
-                try {
-                    const { data, error } = await supabaseClient
-                        .from('councils_equipment')
-                        .select('*');
-
-                    if (data) {
-                        councilsData = data;
-                        updateDashboardStats();
-                        renderTable(getFilteredData());
-                        return;
-                    }
-                } catch(e) { console.error(e); }
-            }
-
-            loadFromLocalStorage();
         }
 
         function loadFromLocalStorage() {
@@ -1333,16 +1329,13 @@
 
         // Dashboard Stats Calculation
         function updateDashboardStats() {
-            // Total Councils Count
             document.getElementById('statTotalCouncils').textContent = councilsData.length + ' مجلس';
 
-            // Active Facilitators Count (Unique names)
             const uniqueFacilitators = new Set(
                 councilsData.map(c => c.main_facilitator ? c.main_facilitator.trim() : '').filter(Boolean)
             );
             document.getElementById('statActiveFacilitators').textContent = uniqueFacilitators.size + ' منشط';
 
-            // Top Location Frequency
             const locationCounts = {};
             councilsData.forEach(c => {
                 if (c.location) {
@@ -1361,7 +1354,6 @@
             }
             document.getElementById('statTopLocation').textContent = topLoc;
 
-            // Day Badges Counts
             const daysList = ['all', 'السبت', 'الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس'];
             daysList.forEach(day => {
                 const badge = document.getElementById('badge-' + day);
@@ -1450,7 +1442,6 @@
             document.getElementById('councilForm').reset();
             document.getElementById('councilId').value = '';
             
-            // Set default day select to currently active day filter if specific day selected
             if (activeDayFilter !== 'all') {
                 document.getElementById('councilDay').value = activeDayFilter;
             }
@@ -1498,7 +1489,7 @@
             document.getElementById('councilModal').classList.remove('active');
         }
 
-        // Handle Add / Edit Submit
+        // Handle Add / Edit Submit directly to Firebase
         async function handleFormSubmit(e) {
             e.preventDefault();
 
@@ -1509,7 +1500,6 @@
             const equipment_used = document.getElementById('equipmentUsed').value.trim();
             const location = document.getElementById('location').value.trim();
 
-            // Collect Custom Fields Values
             const custom_fields = {};
             document.querySelectorAll('.custom-col-input').forEach(input => {
                 const colName = input.getAttribute('data-custom-col');
@@ -1519,29 +1509,37 @@
             const payload = { day, council_name, main_facilitator, equipment_used, location, custom_fields };
 
             if (id) {
-                // UPDATE
-                if (activeBackend === 'firebase' && firebaseDb) {
-                    try { await firebaseDb.ref('councils_equipment/' + id).update(payload); } catch(e) { console.error(e); }
-                } else if (activeBackend === 'supabase' && supabaseClient) {
-                    try { await supabaseClient.from('councils_equipment').update(payload).eq('id', id); } catch(e) { console.error(e); }
+                // UPDATE in Firebase Firestore
+                if (activeBackend === 'firebase' && firestoreDb) {
+                    try {
+                        await firestoreDb.collection('councils_equipment').doc(id).update(payload);
+                        showToast('تمت تعديل البيانات بنجاح في Firebase!');
+                    } catch(err) {
+                        console.error('Firestore update error:', err);
+                        showToast('تعذر التعديل في Firebase، تم الحفظ محلياً', 'warning');
+                    }
                 }
 
                 const idx = councilsData.findIndex(c => c.id == id);
                 if (idx !== -1) councilsData[idx] = { ...councilsData[idx], ...payload };
-                showToast('تمت تعديل بيانات المجلس بنجاح!');
             } else {
-                // INSERT
-                const newId = 'id-' + Date.now();
-                payload.id = newId;
-
-                if (activeBackend === 'firebase' && firebaseDb) {
-                    try { await firebaseDb.ref('councils_equipment/' + newId).set(payload); } catch(e) { console.error(e); }
-                } else if (activeBackend === 'supabase' && supabaseClient) {
-                    try { await supabaseClient.from('councils_equipment').insert([payload]); } catch(e) { console.error(e); }
+                // INSERT into Firebase Firestore
+                if (activeBackend === 'firebase' && firestoreDb) {
+                    try {
+                        const docRef = await firestoreDb.collection('councils_equipment').add(payload);
+                        payload.id = docRef.id;
+                        showToast('تمت إضافة المجلس بنجاح في Firebase!');
+                    } catch(err) {
+                        console.error('Firestore add error:', err);
+                        payload.id = 'id-' + Date.now();
+                        councilsData.unshift(payload);
+                        showToast('تعذر الإضافة في Firebase، تم الحفظ محلياً', 'warning');
+                    }
+                } else {
+                    payload.id = 'id-' + Date.now();
+                    councilsData.unshift(payload);
+                    showToast('تمت إضافة المجلس بنجاح!');
                 }
-
-                councilsData.unshift(payload);
-                showToast('تمت إضافة المجلس بنجاح!');
             }
 
             saveToLocalStorage();
@@ -1564,10 +1562,10 @@
             const id = document.getElementById('deleteTargetId').value;
             if (!id) return;
 
-            if (activeBackend === 'firebase' && firebaseDb) {
-                try { await firebaseDb.ref('councils_equipment/' + id).remove(); } catch(e) { console.error(e); }
-            } else if (activeBackend === 'supabase' && supabaseClient) {
-                try { await supabaseClient.from('councils_equipment').delete().eq('id', id); } catch(e) { console.error(e); }
+            if (activeBackend === 'firebase' && firestoreDb) {
+                try {
+                    await firestoreDb.collection('councils_equipment').doc(id).delete();
+                } catch(e) { console.error(e); }
             }
 
             councilsData = councilsData.filter(c => c.id != id);
@@ -1575,7 +1573,7 @@
             updateDashboardStats();
             renderTable(getFilteredData());
             closeDeleteModal();
-            showToast('تم حذف المجلس بنجاح');
+            showToast('تم حذف المجلس بنجاح من Firebase!');
         }
 
         // Backend Settings Handlers
@@ -1589,34 +1587,23 @@
 
         function saveBackendConfig() {
             const fbConfig = document.getElementById('fbConfigJson').value.trim();
-            const sbUrl = document.getElementById('sbUrl').value.trim();
-            const sbKey = document.getElementById('sbKey').value.trim();
-
             if (fbConfig) {
                 localStorage.setItem('firebase_config', fbConfig);
             }
-            if (sbUrl && sbKey) {
-                localStorage.setItem('supabase_url', sbUrl);
-                localStorage.setItem('supabase_key', sbKey);
-            }
-
             initBackendClient();
             loadCouncilsData();
             closeBackendModal();
-            showToast('تم حفظ إعدادات قاعدة البيانات والتوصيل بنجاح!');
+            showToast('تم حفظ إعدادات Firebase والاتصال بنجاح!');
         }
 
         function disconnectBackend() {
             localStorage.removeItem('firebase_config');
-            localStorage.removeItem('supabase_url');
-            localStorage.removeItem('supabase_key');
-            firebaseDb = null;
-            supabaseClient = null;
+            firestoreDb = null;
             activeBackend = 'local';
             updateDbStatusUI(false, 'تخزين محلي');
             loadFromLocalStorage();
             closeBackendModal();
-            showToast('تم قطع الاتصال والتحويل للتخزين المحلي');
+            showToast('تم التحويل للتخزين المحلي');
         }
 
         // High-Res PNG Export Feature
@@ -1628,19 +1615,15 @@
             const exportSubtitle = document.getElementById('exportSubtitle');
             const noExportElements = document.querySelectorAll('.no-export');
 
-            // Custom Subtitle for PNG showing active day filter
-            const dayLabel = activeDayFilter === 'all' ? 'جميع الأيام' : `يوم ${activeDayFilter}`;
-            exportSubtitle.textContent = `جدول متابعة معدات المنشطين بالمجالس (${dayLabel}) — نادي جسور`;
+            const dayLabel = activeDayFilter === 'all' ? 'جميع الأيام' : 'يوم ' + activeDayFilter;
+            exportSubtitle.textContent = 'جدول متابعة معدات المنشطين بالمجالس (' + dayLabel + ') — نادي جسور';
 
-            // Temporarily show export header
             exportHeader.style.display = 'block';
-
-            // Hide action column & control buttons
             noExportElements.forEach(el => el.style.display = 'none');
 
             try {
                 const canvas = await html2canvas(exportContainer, {
-                    scale: 3, // Ultra crisp PNG
+                    scale: 3,
                     useCORS: true,
                     allowTaint: true,
                     backgroundColor: '#07172e',
@@ -1649,7 +1632,7 @@
 
                 const imageURI = canvas.toDataURL('image/png');
                 const link = document.createElement('a');
-                link.download = `معدات_المنشطين_نادي_جسور_${activeDayFilter}_${new Date().toISOString().slice(0,10)}.png`;
+                link.download = 'معدات_المنشطين_نادي_جسور_' + activeDayFilter + '_' + new Date().toISOString().slice(0,10) + '.png';
                 link.href = imageURI;
                 link.click();
 
@@ -1673,7 +1656,7 @@
             if (type === 'warning') icon = 'fa-triangle-exclamation';
             if (type === 'info') icon = 'fa-circle-info';
 
-            toast.innerHTML = `<i class="fa-solid ${icon}" style="color: var(--gold-primary);"></i> <span>${escapeHtml(message)}</span>`;
+            toast.innerHTML = '<i class="fa-solid ' + icon + '" style="color: var(--gold-primary);"></i> <span>' + escapeHtml(message) + '</span>';
             container.appendChild(toast);
 
             setTimeout(() => {
