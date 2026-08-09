@@ -4,17 +4,2171 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>جدول توزيع المعدات والمجالس | نادي جسور</title>
+    
+    <!-- Google Fonts for Arabic Typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Firebase JS SDK (v9 compatibility mode) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <!-- html2canvas for High Resolution PNG Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            --bg-dark: #07172e;
+            --bg-card: rgba(13, 36, 66, 0.85);
+            --bg-card-hover: rgba(20, 50, 90, 0.9);
+            --navy-deep: #040c18;
+            --navy-header: #0a2240;
+            --gold-primary: #c9a227;
+            --gold-light: #f5d77f;
+            --gold-dark: #997819;
+            --gold-glow: rgba(201, 162, 39, 0.35);
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-gold: rgba(201, 162, 39, 0.4);
+            --border-soft: rgba(255, 255, 255, 0.12);
+            --danger: #ef4444;
+            --success: #10b981;
+            --info: #38bdf8;
+            --font-main: 'Tajawal', 'Cairo', sans-serif;
+            --shadow-lg: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
+            --radius-main: 16px;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(201, 162, 39, 0.18) 0%, transparent 65%),
+                radial-gradient(circle at 100% 100%, rgba(14, 42, 77, 0.85) 0%, transparent 50%);
+            min-height: 100vh;
+            font-family: var(--font-main);
+            color: var(--text-light);
+            padding: 20px 16px 60px 16px;
+            direction: rtl;
+        }
+
+        .container {
+            max-width: 1380px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        header.app-header {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px 10px;
+            position: relative;
+        }
+
+        .logo-container {
+            position: relative;
+            margin-bottom: 12px;
+            display: inline-block;
+        }
+
+        .logo-container::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 170px;
+            height: 170px;
+            background: radial-gradient(circle, var(--gold-glow) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: 0;
+        }
+
+        .club-logo {
+            width: 150px;
+            height: 150px;
+            object-fit: contain;
+            position: relative;
+            z-index: 1;
+            filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.6));
+            transition: transform 0.3s ease;
+        }
+
+        .club-logo:hover {
+            transform: scale(1.04);
+        }
+
+        .main-title {
+            font-size: 2.8rem;
+            font-weight: 900;
+            color: var(--gold-light);
+            text-shadow: 0 3px 12px rgba(0, 0, 0, 0.7);
+            margin-bottom: 2px;
+            letter-spacing: -0.5px;
+        }
+
+        .sub-faculty {
+            font-size: 1.15rem;
+            color: var(--gold-primary);
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .sub-title {
+            font-size: 1.02rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-gold);
+            backdrop-filter: blur(12px);
+            border-radius: var(--radius-main);
+            padding: 18px 20px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            background: var(--bg-card-hover);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6), 0 0 15px var(--gold-glow);
+        }
+
+        .stat-icon {
+            width: 54px;
+            height: 54px;
+            border-radius: 14px;
+            background: rgba(201, 162, 39, 0.15);
+            border: 1px solid var(--border-gold);
+            color: var(--gold-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .stat-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow: hidden;
+        }
+
+        .stat-title {
+            font-size: 0.86rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .stat-value {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--text-light);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .days-nav-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-gold);
+            backdrop-filter: blur(12px);
+            border-radius: var(--radius-main);
+            padding: 14px 18px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            overflow-x: auto;
+        }
+
+        .days-nav-title {
+            font-weight: 800;
+            color: var(--gold-light);
+            font-size: 0.95rem;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-left: 12px;
+            border-left: 2px solid var(--border-gold);
+        }
+
+        .day-tab {
+            padding: 10px 18px;
+            border-radius: 12px;
+            background: rgba(5, 16, 32, 0.6);
+            border: 1px solid var(--border-soft);
+            color: var(--text-light);
+            font-family: var(--font-main);
+            font-size: 0.92rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .day-tab:hover {
+            border-color: var(--gold-primary);
+            background: rgba(201, 162, 39, 0.12);
+        }
+
+        .day-tab.active {
+            background: linear-gradient(135deg, var(--gold-primary) 0%, var(--gold-dark) 100%);
+            color: var(--navy-deep);
+            border-color: var(--gold-light);
+            box-shadow: 0 4px 15px rgba(201, 162, 39, 0.4);
+        }
+
+        .day-badge {
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.78rem;
+            background: rgba(0, 0, 0, 0.35);
+            color: var(--text-light);
+        }
+
+        .day-tab.active .day-badge {
+            background: var(--navy-deep);
+            color: var(--gold-light);
+        }
+
+        .controls-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-gold);
+            backdrop-filter: blur(12px);
+            border-radius: var(--radius-main);
+            padding: 18px 20px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1 1 240px;
+        }
+
+        .search-box i {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold-primary);
+            font-size: 1.1rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 11px 44px 11px 16px;
+            background: rgba(5, 16, 32, 0.7);
+            border: 1px solid var(--border-gold);
+            border-radius: 12px;
+            color: var(--text-light);
+            font-family: var(--font-main);
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: var(--gold-light);
+            box-shadow: 0 0 0 3px var(--gold-glow);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 11px 18px;
+            border-radius: 12px;
+            font-family: var(--font-main);
+            font-size: 0.92rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--gold-primary) 0%, var(--gold-dark) 100%);
+            color: var(--navy-deep);
+            box-shadow: 0 4px 15px rgba(201, 162, 39, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold-primary) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(201, 162, 39, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #34d399 0%, #059669 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
+        }
+
+        .btn-info:hover {
+            background: linear-gradient(135deg, #38bdf8 0%, #0369a1 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(14, 165, 233, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-light);
+            border: 1px solid var(--border-soft);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.16);
+            border-color: var(--border-gold);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline-gold {
+            background: transparent;
+            color: var(--gold-light);
+            border: 1px solid var(--border-gold);
+        }
+
+        .btn-outline-gold:hover {
+            background: rgba(201, 162, 39, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-soft);
+        }
+
+        .status-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: #94a3b8;
+        }
+
+        .status-dot.connected {
+            background: #10b981;
+            box-shadow: 0 0 8px #10b981;
+        }
+
+        .status-dot.disconnected {
+            background: #ef4444;
+            box-shadow: 0 0 8px #ef4444;
+        }
+
+        .table-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-gold);
+            backdrop-filter: blur(12px);
+            border-radius: var(--radius-main);
+            padding: 20px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+        }
+
+        #exportContainer {
+            background: var(--bg-dark);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .export-header {
+            display: none;
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 2px dashed var(--border-gold);
+            margin-bottom: 20px;
+        }
+
+        .export-header img {
+            width: 140px;
+            height: 140px;
+            object-fit: contain;
+            margin-bottom: 10px;
+        }
+
+        .export-header h2 {
+            font-size: 2.4rem;
+            color: var(--gold-light);
+            margin-bottom: 4px;
+            font-weight: 800;
+        }
+
+        .export-header p {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border-gold);
+        }
+
+        table.custom-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: right;
+            font-size: 0.95rem;
+            background: rgba(4, 12, 24, 0.85);
+        }
+
+        table.custom-table th {
+            background: var(--navy-header);
+            color: var(--gold-light);
+            padding: 14px 16px;
+            font-weight: 800;
+            font-size: 0.96rem;
+            border-bottom: 2px solid var(--gold-primary);
+            white-space: nowrap;
+            user-select: none;
+            position: relative;
+        }
+
+        .th-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .col-tools {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            opacity: 0.6;
+            transition: opacity 0.2s ease;
+        }
+
+        table.custom-table th:hover .col-tools {
+            opacity: 1;
+        }
+
+        .col-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.75rem;
+            padding: 2px 4px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .col-btn:hover {
+            color: var(--gold-light);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .col-btn-del:hover {
+            color: var(--danger);
+        }
+
+        table.custom-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-soft);
+            color: var(--text-light);
+            vertical-align: middle;
+            position: relative;
+        }
+
+        table.custom-table tbody tr {
+            transition: background 0.2s ease;
+        }
+
+        table.custom-table tbody tr:hover {
+            background: rgba(201, 162, 39, 0.09);
+        }
+
+        table.custom-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .editable-cell {
+            cursor: pointer;
+            transition: outline 0.15s ease, background 0.15s ease;
+            min-height: 28px;
+            border-radius: 6px;
+            padding: 4px 6px;
+        }
+
+        .editable-cell:hover {
+            background: rgba(201, 162, 39, 0.15);
+            outline: 1px dashed var(--gold-primary);
+        }
+
+        .editable-cell.is-editing {
+            padding: 0;
+            background: transparent;
+            outline: none;
+        }
+
+        .cell-input {
+            width: 100%;
+            background: #0d2442;
+            border: 2px solid var(--gold-primary);
+            color: var(--text-light);
+            font-family: var(--font-main);
+            font-size: 0.95rem;
+            border-radius: 6px;
+            padding: 6px 10px;
+            outline: none;
+            box-shadow: 0 0 10px var(--gold-glow);
+        }
+
+        textarea.cell-input {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .badge-day {
+            display: inline-block;
+            padding: 4px 10px;
+            background: rgba(56, 189, 248, 0.15);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            color: #38bdf8;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .badge-council {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(201, 162, 39, 0.15);
+            border: 1px solid var(--border-gold);
+            color: var(--gold-light);
+            border-radius: 8px;
+            font-weight: 700;
+        }
+
+        .badge-location {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #38bdf8;
+            font-weight: 600;
+        }
+
+        .equipment-list {
+            line-height: 1.6;
+            white-space: pre-line;
+            color: #e2e8f0;
+        }
+
+        .row-actions {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        .btn-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.88rem;
+        }
+
+        .btn-icon-edit {
+            background: rgba(56, 189, 248, 0.15);
+            color: #38bdf8;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+        }
+
+        .btn-icon-edit:hover {
+            background: #38bdf8;
+            color: var(--navy-deep);
+            transform: scale(1.08);
+        }
+
+        .btn-icon-delete {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-icon-delete:hover {
+            background: #ef4444;
+            color: #ffffff;
+            transform: scale(1.08);
+        }
+
+        .empty-state {
+            padding: 48px 20px;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: var(--gold-primary);
+            margin-bottom: 12px;
+            opacity: 0.6;
+        }
+
+        .empty-state p {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(4, 12, 24, 0.88);
+            backdrop-filter: blur(8px);
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-card {
+            background: #0d2442;
+            border: 1px solid var(--border-gold);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 580px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85);
+            transform: scale(0.9);
+            transition: all 0.3s ease;
+            overflow: hidden;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-overlay.active .modal-card {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            padding: 18px 24px;
+            background: var(--navy-header);
+            border-bottom: 1px solid var(--border-gold);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--gold-light);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .close-modal {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .close-modal:hover {
+            color: var(--danger);
+        }
+
+        .modal-body {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            overflow-y: auto;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--gold-light);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 11px 16px;
+            background: rgba(4, 12, 24, 0.8);
+            border: 1px solid var(--border-soft);
+            border-radius: 10px;
+            color: var(--text-light);
+            font-family: var(--font-main);
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--gold-primary);
+            box-shadow: 0 0 0 3px var(--gold-glow);
+        }
+
+        select.form-control option {
+            background: #0d2442;
+            color: var(--text-light);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .modal-footer {
+            padding: 16px 24px 20px 24px;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            border-top: 1px solid var(--border-soft);
+        }
+
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background: #0f2942;
+            border: 1px solid var(--gold-primary);
+            color: var(--text-light);
+            padding: 14px 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            animation: slideIn 0.3s ease forwards;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .col-manage-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 280px;
+            overflow-y: auto;
+        }
+
+        .col-manage-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(4, 12, 24, 0.6);
+            border: 1px solid var(--border-soft);
+            padding: 10px 14px;
+            border-radius: 10px;
+        }
+
+        .col-manage-label {
+            font-weight: 700;
+            color: var(--gold-light);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .col-manage-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        footer {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.88rem;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-soft);
+        }
+
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2.1rem;
+            }
+            .sub-faculty {
+                font-size: 1rem;
+            }
+            .controls-card {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .action-buttons {
+                justify-content: stretch;
+            }
+            .action-buttons .btn {
+                flex: 1 1 auto;
+            }
+            .club-logo {
+                width: 120px;
+                height: 120px;
+            }
+            table.custom-table th, table.custom-table td {
+                padding: 10px 12px;
+                font-size: 0.88rem;
+            }
+        }
+
+        @media print {
+            @page {
+                size: A4 landscape;
+                margin: 10mm;
+            }
+
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+                padding: 0 !important;
+                font-size: 11pt !important;
+            }
+
+            .container {
+                max-width: 100% !important;
+                gap: 10px !important;
+            }
+
+            .no-print, 
+            .stats-grid, 
+            .days-nav-card, 
+            .controls-card, 
+            footer, 
+            .toast-container,
+            .modal-overlay,
+            .no-export,
+            .col-tools {
+                display: none !important;
+            }
+
+            header.app-header {
+                padding: 5px 0 15px 0 !important;
+                border-bottom: 2px solid #c9a227 !important;
+                margin-bottom: 15px !important;
+            }
+
+            .club-logo {
+                width: 90px !important;
+                height: 90px !important;
+                filter: none !important;
+            }
+
+            .main-title {
+                color: #040c18 !important;
+                font-size: 1.8rem !important;
+                text-shadow: none !important;
+            }
+
+            .sub-faculty {
+                color: #997819 !important;
+                font-size: 1.05rem !important;
+            }
+
+            .sub-title {
+                color: #334155 !important;
+                font-size: 0.9rem !important;
+            }
+
+            .table-card {
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+            }
+
+            #exportContainer {
+                background: transparent !important;
+                padding: 0 !important;
+            }
+
+            .table-responsive {
+                border: 1px solid #000000 !important;
+                overflow: visible !important;
+            }
+
+            table.custom-table {
+                background: #ffffff !important;
+                width: 100% !important;
+                border-collapse: collapse !important;
+            }
+
+            table.custom-table th {
+                background: #f1f5f9 !important;
+                color: #0f172a !important;
+                border: 1px solid #000000 !important;
+                padding: 8px 10px !important;
+                font-size: 10pt !important;
+                text-align: right !important;
+            }
+
+            table.custom-table td {
+                color: #000000 !important;
+                border: 1px solid #64748b !important;
+                padding: 8px 10px !important;
+                font-size: 9.5pt !important;
+            }
+
+            .badge-day, .badge-council, .badge-location {
+                background: transparent !important;
+                border: none !important;
+                color: #000000 !important;
+                padding: 0 !important;
+                font-weight: bold !important;
+            }
+
+            table.custom-table thead {
+                display: table-header-group !important;
+            }
+
+            table.custom-table tr {
+                page-break-inside: avoid !important;
+            }
+        }
+    </style>
 </head>
 <body>
+
+    <div class="container">
+        <!-- Top Header with Official Club Logo -->
+        <header class="app-header">
+            <div class="logo-container">
+                <img src="logo.png" alt="شعار نادي جسور" class="club-logo" id="mainClubLogo">
+            </div>
+            <h1 class="main-title">نادي جسور</h1>
+            <div class="sub-faculty">كلية العلوم الإسلامية – جامعة الجزائر 1</div>
+            <p class="sub-title">جدول إدارة وتوزيع معدات المنشطين للمجالس الأسبوعية</p>
+        </header>
+
+        <!-- Dashboard Stats Cards Section -->
+        <div class="stats-grid no-print">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fa-solid fa-boxes-stacked"></i></div>
+                <div class="stat-info">
+                    <span class="stat-title">إجمالي عدد المجالس</span>
+                    <span class="stat-value" id="statTotalCouncils">0 مجلس</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fa-solid fa-user-check"></i></div>
+                <div class="stat-info">
+                    <span class="stat-title">عدد المنشطين النشطين</span>
+                    <span class="stat-value" id="statActiveFacilitators">0 منشط</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fa-solid fa-building-circle-check"></i></div>
+                <div class="stat-info">
+                    <span class="stat-title">أكثر الأماكن والقاعات استخداماً</span>
+                    <span class="stat-value" id="statTopLocation">—</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Days Navigation Tabs (Excluding Friday by default) -->
+        <div class="days-nav-card no-print">
+            <div class="days-nav-title"><i class="fa-solid fa-calendar-days"></i> الأيام:</div>
+            <button class="day-tab active" onclick="filterByDay('all', this)">
+                <span>كل الأيام</span> <span class="day-badge" id="badge-all">0</span>
+            </button>
+            <button class="day-tab" onclick="filterByDay('السبت', this)">
+                <span>السبت</span> <span class="day-badge" id="badge-السبت">0</span>
+            </button>
+            <button class="day-tab" onclick="filterByDay('الأحد', this)">
+                <span>الأحد</span> <span class="day-badge" id="badge-الأحد">0</span>
+            </button>
+            <button class="day-tab" onclick="filterByDay('الإثنين', this)">
+                <span>الإثنين</span> <span class="day-badge" id="badge-الإثنين">0</span>
+            </button>
+            <button class="day-tab" onclick="filterByDay('الثلاثاء', this)">
+                <span>الثلاثاء</span> <span class="day-badge" id="badge-الثلاثاء">0</span>
+            </button>
+            <button class="day-tab" onclick="filterByDay('الأربعاء', this)">
+                <span>الأربعاء</span> <span class="day-badge" id="badge-الأربعاء">0</span>
+            </button>
+            <button class="day-tab" onclick="filterByDay('الخميس', this)">
+                <span>الخميس</span> <span class="day-badge" id="badge-الخميس">0</span>
+            </button>
+        </div>
+
+        <!-- Controls Toolbar -->
+        <div class="controls-card no-print">
+            <!-- Search Box -->
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="searchInput" class="search-input" placeholder="ابحث في كافة البيانات والمعدات..." oninput="handleSearch()">
+            </div>
+
+            <!-- Action Buttons & Status -->
+            <div class="action-buttons">
+                <div class="status-badge" id="dbStatusBadge" title="حالة الاتصال بقاعدة البيانات">
+                    <span class="status-dot" id="dbStatusDot"></span>
+                    <span id="dbStatusText">Cloud Firestore 🔥 (josour-djard)</span>
+                </div>
+
+                <button class="btn btn-primary" onclick="openAddModal()">
+                    <i class="fa-solid fa-plus"></i> إضافة صف
+                </button>
+
+                <button class="btn btn-outline-gold" onclick="openAddColumnModal()">
+                    <i class="fa-solid fa-columns"></i> إضافة عمود
+                </button>
+
+                <button class="btn btn-secondary" onclick="openManageColumnsModal()">
+                    <i class="fa-solid fa-sliders"></i> إدارة الأعمدة
+                </button>
+
+                <button class="btn btn-info" onclick="printTable()">
+                    <i class="fa-solid fa-print"></i> طباعة
+                </button>
+
+                <button class="btn btn-success" onclick="exportTablePNG()">
+                    <i class="fa-solid fa-file-image"></i> تصدير (PNG)
+                </button>
+
+                <button class="btn btn-secondary" onclick="openBackendModal()" title="إعدادات قاعدة البيانات">
+                    <i class="fa-solid fa-database"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Table Container -->
+        <div class="table-card">
+            <div id="exportContainer">
+                <!-- PNG Export Header (Visible only in PNG export) -->
+                <div class="export-header" id="exportHeader">
+                    <img src="logo.png" alt="شعار نادي جسور">
+                    <h2>نادي جسور</h2>
+                    <p class="sub-faculty">كلية العلوم الإسلامية – جامعة الجزائر 1</p>
+                    <p id="exportSubtitle">جدول إدارة وتوزيع معدات المنشطين للمجالس الأسبوعية</p>
+                </div>
+
+                <!-- Editable Data Table -->
+                <div class="table-responsive">
+                    <table class="custom-table" id="equipmentTable">
+                        <thead>
+                            <tr id="tableHeaderRow">
+                                <!-- Dynamic headers generated via JavaScript -->
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <!-- Rows dynamically populated -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <footer class="no-print">
+            جميع الحقوق محفوظة © نادي جسور — كلية العلوم الإسلامية – جامعة الجزائر 1 (نحو أفق الفكر والمعرفة)
+        </footer>
+    </div>
+
+    <!-- Add/Edit Council Modal -->
+    <div class="modal-overlay" id="councilModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">
+                    <i class="fa-solid fa-pen-to-square"></i> <span>إضافة صف جديد</span>
+                </h3>
+                <button class="close-modal" onclick="closeCouncilModal()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <form id="councilForm" onsubmit="handleFormSubmit(event)">
+                <div class="modal-body" id="modalFormFields">
+                    <!-- Form fields dynamically rendered based on active columns -->
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeCouncilModal()">إلغاء</button>
+                    <button type="submit" class="btn btn-primary" id="saveBtn">
+                        <i class="fa-solid fa-floppy-disk"></i> حفظ البيانات
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Dynamic Column Modal -->
+    <div class="modal-overlay" id="addColumnModal">
+        <div class="modal-card" style="max-width: 460px;">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fa-solid fa-columns"></i> إضافة عمود جديد
+                </h3>
+                <button class="close-modal" onclick="closeAddColumnModal()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 0.9rem; color: var(--text-muted);">
+                    أدخل عنوان العمود الجديد للجدول (مثال: "عدد المعدات"، "حالة المعدات"، "وقت الاستلام"، "وقت الإرجاع"، "المسؤول").
+                </p>
+                <div class="form-group">
+                    <label for="newColumnName"><i class="fa-solid fa-heading"></i> عنوان العمود</label>
+                    <input type="text" id="newColumnName" class="form-control" placeholder="أدخل اسم العمود..." required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeAddColumnModal()">إلغاء</button>
+                <button class="btn btn-primary" onclick="handleAddColumn()">
+                    <i class="fa-solid fa-plus"></i> إضافة العمود
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manage Columns Modal (Rename, Reorder, Delete) -->
+    <div class="modal-overlay" id="manageColumnsModal">
+        <div class="modal-card" style="max-width: 540px;">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fa-solid fa-sliders"></i> إدارة وتعديل الأعمدة
+                </h3>
+                <button class="close-modal" onclick="closeManageColumnsModal()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 8px;">
+                    يمكنك إعادة تسمية أي عمود، تغيير ترتيب الأعمدة، أو حذف الأعمدة المضافة.
+                </p>
+                <div class="col-manage-list" id="colManageList">
+                    <!-- Dynamic column manage list rendered here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="closeManageColumnsModal()">تم الإنتهاء</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Delete Modal -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal-card" style="max-width: 440px;">
+            <div class="modal-header">
+                <h3 class="modal-title" style="color: #ef4444;">
+                    <i class="fa-solid fa-triangle-exclamation"></i> تأكيد الحذف
+                </h3>
+                <button class="close-modal" onclick="closeDeleteModal()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 1rem; color: #e2e8f0; line-height: 1.6;" id="deleteModalText">
+                    هل أنت تأكد من رغبتك في حذف هذا الصف؟ لا يمكن التراجع عن هذا الإجراء.
+                </p>
+                <input type="hidden" id="deleteTargetId">
+                <input type="hidden" id="deleteTargetType" value="row">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeDeleteModal()">إلغاء</button>
+                <button class="btn" style="background: #ef4444; color: #fff;" onclick="confirmDeleteAction()">
+                    <i class="fa-solid fa-trash"></i> تأكيد الحذف
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Settings Modal -->
+    <div class="modal-overlay" id="backendModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fa-solid fa-database"></i> إعدادات Cloud Firestore
+                </h3>
+                <button class="close-modal" onclick="closeBackendModal()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 0.9rem; color: var(--text-muted);">
+                    التطبيق متصل بمشروع Firebase الرسمي الخاط بك (<b>josour-djard</b>).
+                </p>
+
+                <div class="form-group">
+                    <label for="fbConfigJson"><i class="fa-fire fab" style="color:#f59e0b;"></i> Firebase SDK Config (JSON)</label>
+                    <textarea id="fbConfigJson" class="form-control" rows="6"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="disconnectBackend()">قطع الاتصال (تخزين محلي)</button>
+                <button class="btn btn-primary" onclick="saveBackendConfig()">
+                    <i class="fa-solid fa-plug"></i> حفظ وإعادة الاتصال
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Application Script -->
     <script>
-        // Generated by build_app.js
+        const officialFirebaseConfig = {
+            apiKey: "AIzaSyAYdprBxSxDf_2mUve4EY7t5jDgo_2_Lb4",
+            authDomain: "josour-djard.firebaseapp.com",
+            projectId: "josour-djard",
+            storageBucket: "josour-djard.firebasestorage.app",
+            messagingSenderId: "830517852419",
+            appId: "1:830517852419:web:80eb5c821346aedc63d136",
+            measurementId: "G-B1VH7QBJHP"
+        };
+
+        const defaultColumns = [
+            { id: 'col_day', name: 'اليوم', type: 'day', fixed: true },
+            { id: 'col_council', name: 'اسم المجلس', type: 'text', fixed: false },
+            { id: 'col_facilitator', name: 'اسم المنشط الرئيسي', type: 'text', fixed: false },
+            { id: 'col_location', name: 'مكان المجلس', type: 'text', fixed: false },
+            { id: 'col_equipment', name: 'المعدات', type: 'textarea', fixed: false },
+            { id: 'col_notes', name: 'ملاحظات', type: 'text', fixed: false }
+        ];
+
+        const initialSampleData = [
+            {
+                id: 'sample-1',
+                col_day: 'السبت',
+                col_council: 'مجلس الابتكار والتقنية',
+                col_facilitator: 'أحمد المنصور',
+                col_location: 'قاعة العلامة بن باديس',
+                col_equipment: 'جهاز عرض HD، مكبر صوت لاسلكي، 20 لوحة تفاعلية',
+                col_notes: 'جاهز ومعاين 🟢'
+            },
+            {
+                id: 'sample-2',
+                col_day: 'الأحد',
+                col_council: 'مجلس الريادة والقيادة',
+                col_facilitator: 'سارة الإبراهيمي',
+                col_location: 'قاعة الاجتماعات الكبرى',
+                col_equipment: 'حاسوب محمول، شاشة ذكية، 2 ميكروفون يدوي',
+                col_notes: 'جاهز 🟢'
+            },
+            {
+                id: 'sample-3',
+                col_day: 'الإثنين',
+                col_council: 'مجلس الفكر والمعرفة',
+                col_facilitator: 'ياسين القاسمي',
+                col_location: 'المكتبة المركزية',
+                col_equipment: 'حقيبة الورشات، منصة إلقاء، كشافات إضاءة',
+                col_notes: 'تم التسليم 🟢'
+            },
+            {
+                id: 'sample-4',
+                col_day: 'الثلاثاء',
+                col_council: 'مجلس التطور والإعلام',
+                col_facilitator: 'أحمد المنصور',
+                col_location: 'استوديو الإبداع',
+                col_equipment: 'كاميرا تصوير 4K، حامل ثلاثي، 2 إضاءة ليد',
+                col_notes: 'تحت الصيانة 🟡'
+            },
+            {
+                id: 'sample-5',
+                col_day: 'الأربعاء',
+                col_council: 'مجلس العلوم والاستكشاف',
+                col_facilitator: 'مريم التميمي',
+                col_location: 'المخبر العلمي',
+                col_equipment: 'مجهر إلكتروني، لوحات عرض تجارب',
+                col_notes: 'جاهز 🟢'
+            },
+            {
+                id: 'sample-6',
+                col_day: 'الخميس',
+                col_council: 'مجلس التخطيط والمشاريع',
+                col_facilitator: 'ياسين القاسمي',
+                col_location: 'قاعة الاجتماعات الكبرى',
+                col_equipment: 'جهاز عرض بروجكتور، سبورة ذكية',
+                col_notes: 'جاهز 🟢'
+            }
+        ];
+
+        let columnsSchema = [];
+        let councilsData = [];
+        let activeDayFilter = 'all';
+        let firestoreDb = null;
+        let activeBackend = 'firebase';
+        let activeEditCell = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initBackendClient();
+            loadColumnsSchema();
+            await loadCouncilsData();
+        });
+
+        function initBackendClient() {
+            const savedFbConfig = localStorage.getItem('firebase_config');
+            const cfg = savedFbConfig ? JSON.parse(savedFbConfig) : officialFirebaseConfig;
+            
+            const textarea = document.getElementById('fbConfigJson');
+            if (textarea) textarea.value = JSON.stringify(cfg, null, 2);
+
+            if (window.firebase) {
+                try {
+                    if (!firebase.apps.length) {
+                        firebase.initializeApp(cfg);
+                    }
+                    firestoreDb = firebase.firestore();
+                    activeBackend = 'firebase';
+                    updateDbStatusUI(true, 'Cloud Firestore 🔥 (josour-djard)');
+                    return;
+                } catch(e) {
+                    console.error('Firebase init error:', e);
+                }
+            }
+
+            activeBackend = 'local';
+            updateDbStatusUI(false, 'تخزين محلي');
+        }
+
+        function updateDbStatusUI(isConnected, text) {
+            const dot = document.getElementById('dbStatusDot');
+            const statusText = document.getElementById('dbStatusText');
+            if (dot) dot.className = 'status-dot ' + (isConnected ? 'connected' : 'disconnected');
+            if (statusText) statusText.textContent = text;
+        }
+
+        function loadColumnsSchema() {
+            const storedSchema = localStorage.getItem('columns_schema_v3');
+            if (storedSchema) {
+                try { columnsSchema = JSON.parse(storedSchema); } catch(e) { columnsSchema = [...defaultColumns]; }
+            } else {
+                columnsSchema = [...defaultColumns];
+                saveColumnsSchemaLocally();
+            }
+
+            if (activeBackend === 'firebase' && firestoreDb) {
+                firestoreDb.collection('equipment_schedule').doc('table_config')
+                    .onSnapshot((doc) => {
+                        if (doc.exists && doc.data().columns) {
+                            columnsSchema = doc.data().columns;
+                            saveColumnsSchemaLocally();
+                            renderTableHeader();
+                            renderTable(getFilteredData());
+                        } else {
+                            saveColumnsSchemaToFirestore();
+                        }
+                    }, (err) => {
+                        console.warn('Firestore table_config snapshot listener warning:', err);
+                    });
+            }
+
+            renderTableHeader();
+        }
+
+        function saveColumnsSchemaLocally() {
+            localStorage.setItem('columns_schema_v3', JSON.stringify(columnsSchema));
+        }
+
+        async function saveColumnsSchemaToFirestore() {
+            saveColumnsSchemaLocally();
+            if (activeBackend === 'firebase' && firestoreDb) {
+                try {
+                    await firestoreDb.collection('equipment_schedule').doc('table_config').set({
+                        columns: columnsSchema,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                } catch(err) {
+                    console.error('Error saving columns to Firestore:', err);
+                }
+            }
+        }
+
+        function renderTableHeader() {
+            const headerRow = document.getElementById('tableHeaderRow');
+            headerRow.innerHTML = '';
+
+            const thNum = document.createElement('th');
+            thNum.style.width = '45px';
+            thNum.textContent = '#';
+            headerRow.appendChild(thNum);
+
+            columnsSchema.forEach((col, index) => {
+                const th = document.createElement('th');
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'th-content';
+                
+                const titleSpan = document.createElement('span');
+                titleSpan.textContent = col.name;
+                contentDiv.appendChild(titleSpan);
+
+                const toolsDiv = document.createElement('div');
+                toolsDiv.className = 'col-tools no-print';
+
+                if (index > 0) {
+                    const btnMoveLeft = document.createElement('button');
+                    btnMoveLeft.className = 'col-btn';
+                    btnMoveLeft.title = 'تحريك يميناً';
+                    btnMoveLeft.innerHTML = '<i class="fa-solid fa-chevron-right"></i>';
+                    btnMoveLeft.onclick = (e) => { e.stopPropagation(); moveColumn(index, -1); };
+                    toolsDiv.appendChild(btnMoveLeft);
+                }
+
+                if (index < columnsSchema.length - 1) {
+                    const btnMoveRight = document.createElement('button');
+                    btnMoveRight.className = 'col-btn';
+                    btnMoveRight.title = 'تحريك يساراً';
+                    btnMoveRight.innerHTML = '<i class="fa-solid fa-chevron-left"></i>';
+                    btnMoveRight.onclick = (e) => { e.stopPropagation(); moveColumn(index, 1); };
+                    toolsDiv.appendChild(btnMoveRight);
+                }
+
+                const btnRename = document.createElement('button');
+                btnRename.className = 'col-btn';
+                btnRename.title = 'إعادة التسمية';
+                btnRename.innerHTML = '<i class="fa-solid fa-pen"></i>';
+                btnRename.onclick = (e) => { e.stopPropagation(); promptRenameColumn(col.id); };
+                toolsDiv.appendChild(btnRename);
+
+                if (col.id !== 'col_day') {
+                    const btnDel = document.createElement('button');
+                    btnDel.className = 'col-btn col-btn-del';
+                    btnDel.title = 'حذف العمود';
+                    btnDel.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+                    btnDel.onclick = (e) => { e.stopPropagation(); openDeleteModalForColumn(col.id, col.name); };
+                    toolsDiv.appendChild(btnDel);
+                }
+
+                contentDiv.appendChild(toolsDiv);
+                th.appendChild(contentDiv);
+                headerRow.appendChild(th);
+            });
+
+            const thActions = document.createElement('th');
+            thActions.className = 'no-print';
+            thActions.style.width = '90px';
+            thActions.textContent = 'الإجراءات';
+            headerRow.appendChild(thActions);
+        }
+
+        async function moveColumn(index, direction) {
+            const targetIndex = index + direction;
+            if (targetIndex < 0 || targetIndex >= columnsSchema.length) return;
+
+            const temp = columnsSchema[index];
+            columnsSchema[index] = columnsSchema[targetIndex];
+            columnsSchema[targetIndex] = temp;
+
+            renderTableHeader();
+            renderTable(getFilteredData());
+            await saveColumnsSchemaToFirestore();
+        }
+
+        async function promptRenameColumn(colId) {
+            const col = columnsSchema.find(c => c.id === colId);
+            if (!col) return;
+
+            const newName = prompt('أدخل الاسم الجديد للعمود:', col.name);
+            if (newName && newName.trim() && newName.trim() !== col.name) {
+                col.name = newName.trim();
+                renderTableHeader();
+                renderTable(getFilteredData());
+                await saveColumnsSchemaToFirestore();
+                showToast('تمت إعادة تسمية العمود إلى "' + col.name + '"');
+            }
+        }
+
+        function openAddColumnModal() {
+            document.getElementById('newColumnName').value = '';
+            document.getElementById('addColumnModal').classList.add('active');
+        }
+
+        function closeAddColumnModal() {
+            document.getElementById('addColumnModal').classList.remove('active');
+        }
+
+        async function handleAddColumn() {
+            const name = document.getElementById('newColumnName').value.trim();
+            if (!name) return;
+
+            if (columnsSchema.some(c => c.name === name)) {
+                showToast('هذا العمود موجود بالفعل', 'warning');
+                return;
+            }
+
+            const colId = 'col_' + Date.now();
+            columnsSchema.push({
+                id: colId,
+                name: name,
+                type: 'text',
+                fixed: false
+            });
+
+            renderTableHeader();
+            renderTable(getFilteredData());
+            closeAddColumnModal();
+            await saveColumnsSchemaToFirestore();
+            showToast('تمت إضافة العمود "' + name + '" بنجاح!');
+        }
+
+        function openManageColumnsModal() {
+            const listContainer = document.getElementById('colManageList');
+            listContainer.innerHTML = '';
+
+            columnsSchema.forEach((col, index) => {
+                const item = document.createElement('div');
+                item.className = 'col-manage-item';
+
+                let actionsHtml = '';
+                if (index > 0) {
+                    actionsHtml += '<button class="btn-icon" onclick="moveColumn(' + index + ', -1)" title="أعلى/يمين"><i class="fa-solid fa-arrow-up"></i></button>';
+                }
+                if (index < columnsSchema.length - 1) {
+                    actionsHtml += '<button class="btn-icon" onclick="moveColumn(' + index + ', 1)" title="أسفل/يسار"><i class="fa-solid fa-arrow-down"></i></button>';
+                }
+                actionsHtml += '<button class="btn-icon btn-icon-edit" onclick="promptRenameColumn(' + "'"+ col.id +"'" + ')" title="تعديل الاسم"><i class="fa-solid fa-pen"></i></button>';
+                if (col.id !== 'col_day') {
+                    actionsHtml += '<button class="btn-icon btn-icon-delete" onclick="openDeleteModalForColumn(' + "'"+ col.id +"'" + ', ' + "'"+ escapeHtml(col.name) +"'" + ')" title="حذف العمود"><i class="fa-solid fa-trash"></i></button>';
+                }
+
+                item.innerHTML = '<div class="col-manage-label"><i class="fa-solid fa-table-columns"></i> <span>' + escapeHtml(col.name) + '</span></div><div class="col-manage-actions">' + actionsHtml + '</div>';
+                listContainer.appendChild(item);
+            });
+
+            document.getElementById('manageColumnsModal').classList.add('active');
+        }
+
+        function closeManageColumnsModal() {
+            document.getElementById('manageColumnsModal').classList.remove('active');
+        }
+
+        async function loadCouncilsData() {
+            if (activeBackend === 'firebase' && firestoreDb) {
+                try {
+                    firestoreDb.collection('councils_equipment').onSnapshot((snapshot) => {
+                        const data = [];
+                        snapshot.forEach(doc => {
+                            data.push({ id: doc.id, ...doc.data() });
+                        });
+
+                        if (data.length > 0) {
+                            councilsData = data;
+                        } else {
+                            initialSampleData.forEach(async (item) => {
+                                await firestoreDb.collection('councils_equipment').add(item);
+                            });
+                            councilsData = initialSampleData;
+                        }
+
+                        updateDashboardStats();
+                        renderTable(getFilteredData());
+                    }, (err) => {
+                        console.warn('Firestore Snapshot listener warning:', err);
+                        loadFromLocalStorage();
+                    });
+                    return;
+                } catch(e) {
+                    console.error(e);
+                    loadFromLocalStorage();
+                }
+            } else {
+                loadFromLocalStorage();
+            }
+        }
+
+        function loadFromLocalStorage() {
+            const stored = localStorage.getItem('councils_equipment_data_v3');
+            if (stored) {
+                try { councilsData = JSON.parse(stored); } catch(e) { councilsData = [...initialSampleData]; }
+            } else {
+                councilsData = [...initialSampleData];
+                saveToLocalStorage();
+            }
+            updateDashboardStats();
+            renderTable(getFilteredData());
+        }
+
+        function saveToLocalStorage() {
+            localStorage.setItem('councils_equipment_data_v3', JSON.stringify(councilsData));
+        }
+
+        function updateDashboardStats() {
+            document.getElementById('statTotalCouncils').textContent = councilsData.length + ' مجلس';
+
+            const uniqueFacilitators = new Set(
+                councilsData.map(c => c.col_facilitator ? c.col_facilitator.trim() : '').filter(Boolean)
+            );
+            document.getElementById('statActiveFacilitators').textContent = uniqueFacilitators.size + ' منشط';
+
+            const locationCounts = {};
+            councilsData.forEach(c => {
+                if (c.col_location) {
+                    const loc = c.col_location.trim();
+                    locationCounts[loc] = (locationCounts[loc] || 0) + 1;
+                }
+            });
+
+            let topLoc = '—';
+            let maxCount = 0;
+            for (const [loc, count] of Object.entries(locationCounts)) {
+                if (count > maxCount) {
+                    maxCount = count;
+                    topLoc = loc + ' (' + count + ' مجالس)';
+                }
+            }
+            document.getElementById('statTopLocation').textContent = topLoc;
+
+            const daysList = ['all', 'السبت', 'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس'];
+            daysList.forEach(day => {
+                const badge = document.getElementById('badge-' + day);
+                if (badge) {
+                    if (day === 'all') badge.textContent = councilsData.length;
+                    else badge.textContent = councilsData.filter(c => c.col_day === day).length;
+                }
+            });
+        }
+
+        function filterByDay(day, btnElement) {
+            activeDayFilter = day;
+            document.querySelectorAll('.day-tab').forEach(t => t.classList.remove('active'));
+            if (btnElement) btnElement.classList.add('active');
+            renderTable(getFilteredData());
+        }
+
+        function getFilteredData() {
+            const searchVal = document.getElementById('searchInput').value.trim().toLowerCase();
+            let result = councilsData;
+
+            if (activeDayFilter !== 'all') {
+                result = result.filter(item => item.col_day === activeDayFilter);
+            }
+
+            if (searchVal) {
+                result = result.filter(item => {
+                    return columnsSchema.some(col => {
+                        const val = item[col.id];
+                        return val && String(val).toLowerCase().includes(searchVal);
+                    });
+                });
+            }
+
+            return result;
+        }
+
+        function handleSearch() {
+            renderTable(getFilteredData());
+        }
+
+        function renderTable(dataToRender) {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            const colSpanCount = 2 + columnsSchema.length;
+
+            if (!dataToRender || dataToRender.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="' + colSpanCount + '"><div class="empty-state"><i class="fa-solid fa-folder-open"></i><p>لا توجد بيانات مطابقة لهذا اليوم أو البحث</p></div></td></tr>';
+                return;
+            }
+
+            dataToRender.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.setAttribute('data-row-id', item.id);
+
+                const tdIndex = document.createElement('td');
+                tdIndex.style.fontWeight = '700';
+                tdIndex.style.color = 'var(--gold-light)';
+                tdIndex.textContent = index + 1;
+                tr.appendChild(tdIndex);
+
+                columnsSchema.forEach(col => {
+                    const td = document.createElement('td');
+                    const cellVal = item[col.id] || '';
+
+                    if (col.id === 'col_day') {
+                        td.innerHTML = '<span class="badge-day"><i class="fa-solid fa-calendar-day"></i> ' + escapeHtml(cellVal || 'السبت') + '</span>';
+                    } else if (col.id === 'col_council') {
+                        td.innerHTML = '<span class="badge-council">' + escapeHtml(cellVal) + '</span>';
+                    } else if (col.id === 'col_location') {
+                        td.innerHTML = '<span class="badge-location"><i class="fa-solid fa-location-dot"></i> ' + escapeHtml(cellVal) + '</span>';
+                    } else if (col.id === 'col_equipment') {
+                        td.className = 'equipment-list';
+                        td.textContent = cellVal;
+                    } else {
+                        td.textContent = cellVal;
+                    }
+
+                    td.classList.add('editable-cell');
+                    td.title = 'اضغط للتعديل المباشر';
+                    td.onclick = (e) => {
+                        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+                        makeCellEditable(td, item.id, col);
+                    };
+
+                    tr.appendChild(td);
+                });
+
+                const tdActions = document.createElement('td');
+                tdActions.className = 'no-print';
+                tdActions.innerHTML = '<div class="row-actions"><button class="btn-icon btn-icon-edit" onclick="openEditModal(' + "'"+ item.id +"'" + ')" title="تعديل في نافذة"><i class="fa-solid fa-pen"></i></button><button class="btn-icon btn-icon-delete" onclick="openDeleteModalForRow(' + "'"+ item.id +"'" + ')" title="حذف الصف"><i class="fa-solid fa-trash"></i></button></div>';
+                tr.appendChild(tdActions);
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        function makeCellEditable(tdElement, rowId, colSchema) {
+            if (activeEditCell && activeEditCell !== tdElement) {
+                commitInlineCellEdit(activeEditCell);
+            }
+
+            activeEditCell = tdElement;
+            tdElement.classList.add('is-editing');
+            const rowItem = councilsData.find(c => c.id == rowId);
+            const currentVal = rowItem ? (rowItem[colSchema.id] || '') : '';
+
+            tdElement.innerHTML = '';
+
+            let inputEl;
+
+            if (colSchema.id === 'col_day') {
+                inputEl = document.createElement('select');
+                inputEl.className = 'cell-input';
+                ['السبت', 'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس'].forEach(d => {
+                    const opt = document.createElement('option');
+                    opt.value = d;
+                    opt.textContent = d;
+                    if (d === currentVal) opt.selected = true;
+                    inputEl.appendChild(opt);
+                });
+            } else if (colSchema.type === 'textarea' || colSchema.id === 'col_equipment') {
+                inputEl = document.createElement('textarea');
+                inputEl.className = 'cell-input';
+                inputEl.value = currentVal;
+            } else {
+                inputEl = document.createElement('input');
+                inputEl.type = 'text';
+                inputEl.className = 'cell-input';
+                inputEl.value = currentVal;
+            }
+
+            inputEl.setAttribute('data-row-id', rowId);
+            inputEl.setAttribute('data-col-id', colSchema.id);
+
+            tdElement.appendChild(inputEl);
+            inputEl.focus();
+
+            inputEl.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey && colSchema.type !== 'textarea') {
+                    e.preventDefault();
+                    commitInlineCellEdit(tdElement);
+                } else if (e.key === 'Escape') {
+                    cancelInlineCellEdit(tdElement, currentVal, colSchema);
+                }
+            });
+
+            inputEl.addEventListener('blur', () => {
+                setTimeout(() => {
+                    if (activeEditCell === tdElement) {
+                        commitInlineCellEdit(tdElement);
+                    }
+                }, 150);
+            });
+        }
+
+        async function commitInlineCellEdit(tdElement) {
+            const inputEl = tdElement.querySelector('.cell-input');
+            if (!inputEl) return;
+
+            const rowId = inputEl.getAttribute('data-row-id');
+            const colId = inputEl.getAttribute('data-col-id');
+            const newVal = inputEl.value.trim();
+
+            activeEditCell = null;
+
+            const idx = councilsData.findIndex(c => c.id == rowId);
+            if (idx !== -1) {
+                councilsData[idx][colId] = newVal;
+
+                if (activeBackend === 'firebase' && firestoreDb) {
+                    try {
+                        const updateObj = {};
+                        updateObj[colId] = newVal;
+                        await firestoreDb.collection('councils_equipment').doc(rowId).update(updateObj);
+                    } catch(err) {
+                        console.error('Firestore cell update error:', err);
+                    }
+                }
+
+                saveToLocalStorage();
+                updateDashboardStats();
+                renderTable(getFilteredData());
+                showToast('تم حفظ التغيير بنجاح!');
+            }
+        }
+
+        function cancelInlineCellEdit(tdElement, originalVal, colSchema) {
+            activeEditCell = null;
+            renderTable(getFilteredData());
+        }
+
+        function openAddModal() {
+            const formContainer = document.getElementById('modalFormFields');
+            formContainer.innerHTML = '<input type="hidden" id="councilId">';
+
+            columnsSchema.forEach(col => {
+                const div = document.createElement('div');
+                div.className = 'form-group';
+
+                const label = document.createElement('label');
+                label.innerHTML = '<i class="fa-solid fa-tag"></i> ' + escapeHtml(col.name);
+                div.appendChild(label);
+
+                if (col.id === 'col_day') {
+                    const select = document.createElement('select');
+                    select.id = 'field_' + col.id;
+                    select.className = 'form-control';
+                    select.required = true;
+                    ['السبت', 'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس'].forEach(d => {
+                        const opt = document.createElement('option');
+                        opt.value = d;
+                        opt.textContent = d;
+                        if (activeDayFilter !== 'all' && d === activeDayFilter) opt.selected = true;
+                        select.appendChild(opt);
+                    });
+                    div.appendChild(select);
+                } else if (col.type === 'textarea' || col.id === 'col_equipment') {
+                    const textarea = document.createElement('textarea');
+                    textarea.id = 'field_' + col.id;
+                    textarea.className = 'form-control';
+                    textarea.placeholder = 'أدخل ' + col.name + '...';
+                    div.appendChild(textarea);
+                } else {
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.id = 'field_' + col.id;
+                    input.className = 'form-control';
+                    input.placeholder = 'أدخل ' + col.name + '...';
+                    div.appendChild(input);
+                }
+
+                formContainer.appendChild(div);
+            });
+
+            document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-plus"></i> <span>إضافة صف جديد</span>';
+            document.getElementById('councilModal').classList.add('active');
+        }
+
+        function openEditModal(id) {
+            const item = councilsData.find(c => c.id == id);
+            if (!item) return;
+
+            openAddModal();
+            document.getElementById('councilId').value = item.id;
+            document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-pen-to-square"></i> <span>تعديل البيانات</span>';
+
+            columnsSchema.forEach(col => {
+                const el = document.getElementById('field_' + col.id);
+                if (el) {
+                    el.value = item[col.id] || '';
+                }
+            });
+        }
+
+        function closeCouncilModal() {
+            document.getElementById('councilModal').classList.remove('active');
+        }
+
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+
+            const id = document.getElementById('councilId').value;
+            const payload = {};
+
+            columnsSchema.forEach(col => {
+                const el = document.getElementById('field_' + col.id);
+                if (el) {
+                    payload[col.id] = el.value.trim();
+                }
+            });
+
+            if (id) {
+                if (activeBackend === 'firebase' && firestoreDb) {
+                    try {
+                        await firestoreDb.collection('councils_equipment').doc(id).update(payload);
+                        showToast('تمت تعديل البيانات بنجاح في Firebase!');
+                    } catch(err) {
+                        console.error('Firestore update error:', err);
+                        showToast('تعذر التعديل في Firebase، تم الحفظ محلياً', 'warning');
+                    }
+                }
+
+                const idx = councilsData.findIndex(c => c.id == id);
+                if (idx !== -1) councilsData[idx] = { ...councilsData[idx], ...payload };
+            } else {
+                if (activeBackend === 'firebase' && firestoreDb) {
+                    try {
+                        const docRef = await firestoreDb.collection('councils_equipment').add(payload);
+                        payload.id = docRef.id;
+                        showToast('تمت إضاف الصف بنجاح في Firebase!');
+                    } catch(err) {
+                        console.error('Firestore add error:', err);
+                        payload.id = 'id-' + Date.now();
+                        councilsData.unshift(payload);
+                        showToast('تعذر الإضافة في Firebase، تم الحفظ محلياً', 'warning');
+                    }
+                } else {
+                    payload.id = 'id-' + Date.now();
+                    councilsData.unshift(payload);
+                    showToast('تمت الإضافة بنجاح!');
+                }
+            }
+
+            saveToLocalStorage();
+            updateDashboardStats();
+            renderTable(getFilteredData());
+            closeCouncilModal();
+        }
+
+        function openDeleteModalForRow(id) {
+            document.getElementById('deleteTargetId').value = id;
+            document.getElementById('deleteTargetType').value = 'row';
+            document.getElementById('deleteModalText').textContent = 'هل أنت تأكد من رغبتك في حذف بيانات هذا الصف؟ لا يمكن التراجع عن هذا الإجراء.';
+            document.getElementById('deleteModal').classList.add('active');
+        }
+
+        function openDeleteModalForColumn(colId, colName) {
+            document.getElementById('deleteTargetId').value = colId;
+            document.getElementById('deleteTargetType').value = 'column';
+            document.getElementById('deleteModalText').textContent = 'هل أنت تأكد من رغبتك في حذف العمود "' + colName + '"؟ سيتم حذف العمود من كافة الصفوف.';
+            document.getElementById('deleteModal').classList.add('active');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('active');
+        }
+
+        async function confirmDeleteAction() {
+            const targetId = document.getElementById('deleteTargetId').value;
+            const targetType = document.getElementById('deleteTargetType').value;
+            if (!targetId) return;
+
+            if (targetType === 'row') {
+                if (activeBackend === 'firebase' && firestoreDb) {
+                    try {
+                        await firestoreDb.collection('councils_equipment').doc(targetId).delete();
+                    } catch(e) { console.error(e); }
+                }
+                councilsData = councilsData.filter(c => c.id != targetId);
+                saveToLocalStorage();
+                updateDashboardStats();
+                renderTable(getFilteredData());
+                showToast('تم حذف الصف بنجاح!');
+            } else if (targetType === 'column') {
+                columnsSchema = columnsSchema.filter(c => c.id !== targetId);
+                renderTableHeader();
+                renderTable(getFilteredData());
+                await saveColumnsSchemaToFirestore();
+                closeManageColumnsModal();
+                showToast('تم حذف العمود بنجاح!');
+            }
+
+            closeDeleteModal();
+        }
+
+        function printTable() {
+            window.print();
+        }
+
+        function openBackendModal() {
+            document.getElementById('backendModal').classList.add('active');
+        }
+
+        function closeBackendModal() {
+            document.getElementById('backendModal').classList.remove('active');
+        }
+
+        function saveBackendConfig() {
+            const fbConfig = document.getElementById('fbConfigJson').value.trim();
+            if (fbConfig) {
+                localStorage.setItem('firebase_config', fbConfig);
+            }
+            initBackendClient();
+            loadCouncilsData();
+            closeBackendModal();
+            showToast('تم حفظ إعدادات Firebase والاتصال بنجاح!');
+        }
+
+        function disconnectBackend() {
+            localStorage.removeItem('firebase_config');
+            firestoreDb = null;
+            activeBackend = 'local';
+            updateDbStatusUI(false, 'تخزين محلي');
+            loadFromLocalStorage();
+            closeBackendModal();
+            showToast('تم التحويل للتخزين المحلي');
+        }
+
+        async function exportTablePNG() {
+            showToast('جاري تجهيز صورة الجدول عالية الدقة...', 'info');
+
+            const exportContainer = document.getElementById('exportContainer');
+            const exportHeader = document.getElementById('exportHeader');
+            const exportSubtitle = document.getElementById('exportSubtitle');
+            const noExportElements = document.querySelectorAll('.no-export');
+
+            const dayLabel = activeDayFilter === 'all' ? 'جميع الأيام' : 'يوم ' + activeDayFilter;
+            exportSubtitle.textContent = 'جدول متابعة وتوزيع معدات المنشطين بالمجالس (' + dayLabel + ') — نادي جسور';
+
+            exportHeader.style.display = 'block';
+            noExportElements.forEach(el => el.style.display = 'none');
+
+            try {
+                const canvas = await html2canvas(exportContainer, {
+                    scale: 3,
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: '#07172e',
+                    logging: false
+                });
+
+                const imageURI = canvas.toDataURL('image/png');
+                const link = document.createElement('a');
+                link.download = 'معدات_المنشطين_نادي_جسور_' + activeDayFilter + '_' + new Date().toISOString().slice(0,10) + '.png';
+                link.href = imageURI;
+                link.click();
+
+                showToast('تم تحميل صورة الجدول بنجاح!', 'success');
+            } catch (err) {
+                console.error('PNG Export Error:', err);
+                showToast('حدث خطأ أثناء تصدير الصورة', 'warning');
+            } finally {
+                exportHeader.style.display = 'none';
+                noExportElements.forEach(el => el.style.display = '');
+            }
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+
+            let icon = 'fa-circle-check';
+            if (type === 'warning') icon = 'fa-triangle-exclamation';
+            if (type === 'info') icon = 'fa-circle-info';
+
+            toast.innerHTML = '<i class="fa-solid ' + icon + '" style="color: var(--gold-primary);"></i> <span>' + escapeHtml(message) + '</span>';
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
     </script>
 </body>
 </html>
