@@ -1204,7 +1204,7 @@
 
     <!-- Add Dynamic Column Modal -->
     <div class="modal-overlay" id="addColumnModal">
-        <div class="modal-card" style="max-width: 460px;">
+        <div class="modal-card" style="max-width: 480px;">
             <div class="modal-header">
                 <h3 class="modal-title">
                     <i class="fa-solid fa-columns"></i> إضافة عمود جديد
@@ -1216,11 +1216,12 @@
             <form id="addColumnForm" onsubmit="handleAddColumn(event)">
                 <div class="modal-body">
                     <p style="font-size: 0.9rem; color: var(--text-muted);">
-                        أدخل عنوان العمود الجديد للجدول (مثال: "عدد المعدات"، "حالة المعدات"، "وقت الاستلام"، "وقت الإرجاع"، "المسؤول").
+                        أدخل عنوان العمود الجديد للجدول (مثال: "حالة المعدات"، "عدد القطع"، "وقت التسليم"، "اسم المسؤول").
                     </p>
                     <div class="form-group">
                         <label for="newColumnName"><i class="fa-solid fa-heading"></i> عنوان العمود</label>
-                        <input type="text" id="newColumnName" class="form-control" placeholder="أدخل اسم العمود..." required autocomplete="off">
+                        <input type="text" id="newColumnName" class="form-control" placeholder="مثال: حالة المعدات..." required autocomplete="off" oninput="clearColAddError()">
+                        <div id="colAddError" style="display:none; color:#ef4444; background: rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.4); padding:10px 14px; border-radius:10px; font-size:0.88rem; font-weight:600; margin-top:8px;"></div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -1602,9 +1603,22 @@
             }
         }
 
+        function clearColAddError() {
+            const errDiv = document.getElementById('colAddError');
+            if (errDiv) {
+                errDiv.style.display = 'none';
+                errDiv.textContent = '';
+            }
+            const inputEl = document.getElementById('newColumnName');
+            if (inputEl) {
+                inputEl.style.borderColor = '';
+            }
+        }
+
         function openAddColumnModal() {
             const input = document.getElementById('newColumnName');
             if (input) input.value = '';
+            clearColAddError();
             document.getElementById('addColumnModal').classList.add('active');
             setTimeout(() => {
                 if (input) input.focus();
@@ -1613,21 +1627,35 @@
 
         function closeAddColumnModal() {
             document.getElementById('addColumnModal').classList.remove('active');
+            clearColAddError();
         }
 
         async function handleAddColumn(e) {
             if (e && e.preventDefault) e.preventDefault();
 
+            clearColAddError();
             const inputEl = document.getElementById('newColumnName');
+            const errDiv = document.getElementById('colAddError');
             const name = inputEl ? inputEl.value.trim() : '';
 
             if (!name) {
-                showToast('يرجى إدخال اسم العمود', 'warning');
+                if (errDiv) {
+                    errDiv.textContent = '⚠️ يرجى إدخال اسم العمود المُراد إضافته.';
+                    errDiv.style.display = 'block';
+                }
+                if (inputEl) inputEl.style.borderColor = '#ef4444';
                 return;
             }
 
-            if (columnsSchema.some(c => c.name.trim().toLowerCase() === name.toLowerCase())) {
-                showToast('هذا العمود موجود بالفعل', 'warning');
+            // Check if column already exists
+            const existingCol = columnsSchema.find(c => c.name.trim().toLowerCase() === name.toLowerCase());
+            if (existingCol) {
+                if (errDiv) {
+                    errDiv.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> العمود <b>"' + escapeHtml(name) + '"</b> موجود بالفعل في الجدول! يرجى إدخال عنوان عمود جديد (مثال: "حالة المعدات"، "عدد القطع").';
+                    errDiv.style.display = 'block';
+                }
+                if (inputEl) inputEl.style.borderColor = '#ef4444';
+                showToast('العمود "' + name + '" موجود بالفعل!', 'warning');
                 return;
             }
 
