@@ -1377,7 +1377,7 @@
             if (statusText) statusText.textContent = text;
         }
 
-        // Data Sync & Loading
+        // Data Sync & Loading Logic Fix (Prevents deleted sample councils from re-appearing)
         async function loadCouncilsData() {
             if (activeBackend === 'firebase' && firestoreDb) {
                 try {
@@ -1387,8 +1387,12 @@
                             data.push({ id: doc.id, ...doc.data() });
                         });
 
-                        if (data.length > 0) {
+                        // If Firestore has ever received data, sync it (even if 0 items remain after deletion)
+                        const hasEverSynced = localStorage.getItem('has_synced_firestore');
+                        if (data.length > 0 || hasEverSynced) {
                             councilsData = data;
+                            localStorage.setItem('has_synced_firestore', 'true');
+                            saveToLocalStorage();
                             updateDashboardStats();
                             renderTable(getFilteredData());
                         } else {
@@ -1410,12 +1414,23 @@
 
         function loadFromLocalStorage() {
             const stored = localStorage.getItem('councils_equipment_data_v3');
-            if (stored) {
-                try { councilsData = JSON.parse(stored); } catch(e) { councilsData = [...initialSampleData]; }
-            } else {
+            const initialized = localStorage.getItem('app_initialized_v3');
+
+            if (stored !== null) {
+                try {
+                    councilsData = JSON.parse(stored);
+                } catch(e) {
+                    councilsData = [];
+                }
+            } else if (!initialized) {
+                // First-time setup only: Load sample data once, then mark as initialized
                 councilsData = [...initialSampleData];
+                localStorage.setItem('app_initialized_v3', 'true');
                 saveToLocalStorage();
+            } else {
+                councilsData = [];
             }
+
             updateDashboardStats();
             renderTable(getFilteredData());
         }
