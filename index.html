@@ -18,9 +18,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     
-    <!-- Supabase JS Client -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
     <!-- html2canvas for High Resolution PNG Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
@@ -394,6 +391,7 @@
             font-weight: 600;
             background: rgba(0, 0, 0, 0.4);
             border: 1px solid var(--border-soft);
+            cursor: pointer;
         }
 
         .status-dot {
@@ -1061,6 +1059,13 @@
                         <input type="text" id="newColumnName" class="form-control" placeholder="مثال: حالة المعدات..." required autocomplete="off" oninput="clearColAddError()">
                         <div id="colAddError" style="display:none; color:#ef4444; background: rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.4); padding:10px 14px; border-radius:10px; font-size:0.88rem; font-weight:600; margin-top:8px;"></div>
                     </div>
+                    <div class="form-group">
+                        <label for="newColumnType"><i class="fa-solid fa-list-check"></i> نوع إدخال العمود</label>
+                        <select id="newColumnType" class="form-control">
+                            <option value="text">نص عادي (سطر واحد)</option>
+                            <option value="textarea">نص متعدد الأسطر (قائمة/ملاحظات)</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="closeAddColumnModal()">إلغاء</button>
@@ -1271,6 +1276,7 @@
 
         function renderTableHeader() {
             const tr = document.getElementById('tableHeaderRow');
+            if (!tr) return;
             tr.innerHTML = '';
 
             // Index column
@@ -1349,7 +1355,8 @@
             const savedFbConfig = localStorage.getItem('firebase_config');
             const cfg = savedFbConfig ? JSON.parse(savedFbConfig) : officialFirebaseConfig;
             
-            document.getElementById('fbConfigJson').value = JSON.stringify(cfg, null, 2);
+            const fbConfigEl = document.getElementById('fbConfigJson');
+            if (fbConfigEl) fbConfigEl.value = JSON.stringify(cfg, null, 2);
 
             if (window.firebase) {
                 try {
@@ -1377,7 +1384,7 @@
             if (statusText) statusText.textContent = text;
         }
 
-                // Data Sync & Loading Logic Fix (Prevents deleted sample councils from re-appearing)
+        // Data Sync & Loading Logic Fix (Prevents deleted sample councils from re-appearing)
         async function loadCouncilsData() {
             if (activeBackend === 'firebase' && firestoreDb) {
                 try {
@@ -1387,7 +1394,6 @@
                             data.push({ id: doc.id, ...doc.data() });
                         });
 
-                        // If Firestore has ever received data, sync it (even if 0 items remain after deletion)
                         const hasEverSynced = localStorage.getItem('has_synced_firestore');
                         if (data.length > 0 || hasEverSynced) {
                             councilsData = data;
@@ -1433,33 +1439,6 @@
 
             updateDashboardStats();
             renderTable(getFilteredData());
-        } else {
-                            loadFromLocalStorage();
-                        }
-                    }, (err) => {
-                        console.warn('Firestore Snapshot listener warning:', err);
-                        loadFromLocalStorage();
-                    });
-                    return;
-                } catch(e) {
-                    console.error(e);
-                    loadFromLocalStorage();
-                }
-            } else {
-                loadFromLocalStorage();
-            }
-        }
-
-        function loadFromLocalStorage() {
-            const stored = localStorage.getItem('councils_equipment_data_v3');
-            if (stored) {
-                try { councilsData = JSON.parse(stored); } catch(e) { councilsData = [...initialSampleData]; }
-            } else {
-                councilsData = [...initialSampleData];
-                saveToLocalStorage();
-            }
-            updateDashboardStats();
-            renderTable(getFilteredData());
         }
 
         function saveToLocalStorage() {
@@ -1468,12 +1447,14 @@
 
         // Stats Cards Calculation
         function updateDashboardStats() {
-            document.getElementById('statTotalCouncils').textContent = councilsData.length + ' مجلس';
+            const totalEl = document.getElementById('statTotalCouncils');
+            if (totalEl) totalEl.textContent = councilsData.length + ' مجلس';
 
             const uniqueFacilitators = new Set(
                 councilsData.map(c => c.col_facilitator ? String(c.col_facilitator).trim() : '').filter(Boolean)
             );
-            document.getElementById('statActiveFacilitators').textContent = uniqueFacilitators.size + ' منشط';
+            const facEl = document.getElementById('statActiveFacilitators');
+            if (facEl) facEl.textContent = uniqueFacilitators.size + ' منشط';
 
             const locationCounts = {};
             councilsData.forEach(c => {
@@ -1491,7 +1472,8 @@
                     topLoc = loc + ' (' + count + ' مجالس)';
                 }
             }
-            document.getElementById('statTopLocation').textContent = topLoc;
+            const topLocEl = document.getElementById('statTopLocation');
+            if (topLocEl) topLocEl.textContent = topLoc;
 
             const daysList = ['all', 'السبت', 'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس'];
             daysList.forEach(day => {
@@ -1512,7 +1494,8 @@
         }
 
         function getFilteredData() {
-            const searchVal = document.getElementById('searchInput').value.trim().toLowerCase();
+            const searchInput = document.getElementById('searchInput');
+            const searchVal = searchInput ? searchInput.value.trim().toLowerCase() : '';
             let result = councilsData;
 
             if (activeDayFilter !== 'all') {
@@ -1538,12 +1521,13 @@
         // Render Data Table Rows with Inline Cell Editing
         function renderTable(dataToRender) {
             const tbody = document.getElementById('tableBody');
+            if (!tbody) return;
             tbody.innerHTML = '';
 
             const colSpanCount = 2 + columnsSchema.length;
 
             if (!dataToRender || dataToRender.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="' + colSpanCount + '"><div class="empty-state"><i class="fa-solid fa-folder-open"></i><p>لا توجد بيانات مطابقة لهذا اليوم أو البحث</p></div></td></tr>';
+                tbody.innerHTML = '<tr><td colspan="' + colSpanCount + '"><div class="empty-state"><i class="fa-solid fa-folder-open"></i><p>لا توجد مجالس مطابقة لهذا اليوم أو البحث</p></div></td></tr>';
                 return;
             }
 
@@ -1590,7 +1574,7 @@
                 // Row action buttons (Edit modal & Delete)
                 const tdActions = document.createElement('td');
                 tdActions.className = 'no-print';
-                tdActions.innerHTML = '<div class="row-actions"><button type="button" class="btn-icon btn-icon-edit" onclick="openEditModal(' + "'"+ item.id +"'" + ')" title="تعديل في نافذة"><i class="fa-solid fa-pen"></i></button><button type="button" class="btn-icon btn-icon-delete" onclick="openDeleteModalForRow(' + "'"+ item.id +"'" + ')" title="حذف الصف"><i class="fa-solid fa-trash"></i></button></div>';
+                tdActions.innerHTML = '<div class="row-actions"><button type="button" class="btn-icon btn-icon-edit" onclick="openEditModal(' + "'"+ item.id +"'" + ')" title="تعديل في نافذة"><i class="fa-solid fa-pen"></i></button><button type="button" class="btn-icon btn-icon-delete" onclick="openDeleteModalForRow(' + "'"+ item.id +"'" + ')" title="حذف المجلس"><i class="fa-solid fa-trash"></i></button></div>';
                 tr.appendChild(tdActions);
 
                 tbody.appendChild(tr);
@@ -1699,6 +1683,7 @@
         // Modal Form Handlers (Add/Edit Row)
         function openAddModal() {
             const formContainer = document.getElementById('modalFormFields');
+            if (!formContainer) return;
             formContainer.innerHTML = '<input type="hidden" id="councilId">';
 
             columnsSchema.forEach(col => {
@@ -1742,7 +1727,8 @@
                 formContainer.appendChild(div);
             });
 
-            document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-plus-circle"></i> <span>إضافة مجلس جديد</span>';
+            const titleEl = document.getElementById('modalTitle');
+            if (titleEl) titleEl.innerHTML = '<i class="fa-solid fa-plus-circle"></i> <span>إضافة مجلس جديد</span>';
             const saveBtn = document.getElementById('saveBtn');
             if (saveBtn) {
                 saveBtn.innerHTML = '<i class="fa-solid fa-plus-circle"></i> <span>إضافة المجلس الآن</span>';
@@ -1756,7 +1742,8 @@
 
             openAddModal();
             document.getElementById('councilId').value = item.id;
-            document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-pen-to-square"></i> <span>تعديل بيانات المجلس</span>';
+            const titleEl = document.getElementById('modalTitle');
+            if (titleEl) titleEl.innerHTML = '<i class="fa-solid fa-pen-to-square"></i> <span>تعديل بيانات المجلس</span>';
             const saveBtn = document.getElementById('saveBtn');
             if (saveBtn) {
                 saveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> <span>حفظ التعديلات</span>';
@@ -1901,8 +1888,10 @@
 
         // Add Dynamic Custom Column Handlers with Duplicate Prevention
         function openAddColumnModal() {
-            document.getElementById('newColumnName').value = '';
-            document.getElementById('colAddError').style.display = 'none';
+            const inputEl = document.getElementById('newColumnName');
+            if (inputEl) inputEl.value = '';
+            const errDiv = document.getElementById('colAddError');
+            if (errDiv) errDiv.style.display = 'none';
             document.getElementById('addColumnModal').classList.add('active');
         }
 
@@ -1911,12 +1900,18 @@
         }
 
         function clearColAddError() {
-            document.getElementById('colAddError').style.display = 'none';
+            const errDiv = document.getElementById('colAddError');
+            if (errDiv) errDiv.style.display = 'none';
         }
 
         function handleAddColumn(e) {
             e.preventDefault();
-            const colName = document.getElementById('newColumnName').value.trim();
+            const colNameInput = document.getElementById('newColumnName');
+            if (!colNameInput) return;
+            const colName = colNameInput.value.trim();
+
+            const typeSelect = document.getElementById('newColumnType');
+            const colType = typeSelect ? typeSelect.value : 'text';
 
             if (!colName) return;
 
@@ -1924,8 +1919,10 @@
             const exists = columnsSchema.some(c => c.name.toLowerCase() === colName.toLowerCase());
             if (exists) {
                 const errDiv = document.getElementById('colAddError');
-                errDiv.textContent = 'عنوان العمود "' + colName + '" موجود بالفعل! يرجى إدخال مسمى آخر.';
-                errDiv.style.display = 'block';
+                if (errDiv) {
+                    errDiv.textContent = 'عنوان العمود "' + colName + '" موجود بالفعل! يرجى إدخال مسمى آخر.';
+                    errDiv.style.display = 'block';
+                }
                 return;
             }
 
@@ -1933,7 +1930,7 @@
             columnsSchema.push({
                 id: newColId,
                 name: colName,
-                type: 'text',
+                type: colType,
                 isDefault: false
             });
 
@@ -1956,6 +1953,7 @@
 
         function renderManageColumnsList() {
             const listContainer = document.getElementById('manageColumnsList');
+            if (!listContainer) return;
             listContainer.innerHTML = '';
 
             columnsSchema.forEach((col, index) => {
