@@ -1377,7 +1377,7 @@
             if (statusText) statusText.textContent = text;
         }
 
-        // Data Sync & Loading Logic Fix (Prevents deleted sample councils from re-appearing)
+                // Data Sync & Loading Logic Fix (Prevents deleted sample councils from re-appearing)
         async function loadCouncilsData() {
             if (activeBackend === 'firebase' && firestoreDb) {
                 try {
@@ -1431,6 +1431,33 @@
                 councilsData = [];
             }
 
+            updateDashboardStats();
+            renderTable(getFilteredData());
+        } else {
+                            loadFromLocalStorage();
+                        }
+                    }, (err) => {
+                        console.warn('Firestore Snapshot listener warning:', err);
+                        loadFromLocalStorage();
+                    });
+                    return;
+                } catch(e) {
+                    console.error(e);
+                    loadFromLocalStorage();
+                }
+            } else {
+                loadFromLocalStorage();
+            }
+        }
+
+        function loadFromLocalStorage() {
+            const stored = localStorage.getItem('councils_equipment_data_v3');
+            if (stored) {
+                try { councilsData = JSON.parse(stored); } catch(e) { councilsData = [...initialSampleData]; }
+            } else {
+                councilsData = [...initialSampleData];
+                saveToLocalStorage();
+            }
             updateDashboardStats();
             renderTable(getFilteredData());
         }
