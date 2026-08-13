@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>معدات المنشطين | نادي جسور</title>
+    <title>جدول توزيع المعدات والمجالس | نادي جسور</title>
     
     <!-- Google Fonts for Arabic Typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,7 +15,6 @@
     
     <!-- Firebase JS SDK (v9 compatibility mode) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     
     <!-- html2canvas for High Resolution PNG Export -->
@@ -63,7 +62,7 @@
         }
 
         .container {
-            max-width: 1280px;
+            max-width: 1380px;
             margin: 0 auto;
             display: flex;
             flex-direction: column;
@@ -101,12 +100,12 @@
         }
 
         .club-logo {
-            width: 145px;
-            height: 145px;
+            width: 150px;
+            height: 150px;
             object-fit: contain;
             position: relative;
             z-index: 1;
-            filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.5));
+            filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.6));
             transition: transform 0.3s ease;
         }
 
@@ -115,16 +114,23 @@
         }
 
         .main-title {
-            font-size: 2.6rem;
+            font-size: 2.8rem;
             font-weight: 900;
             color: var(--gold-light);
-            text-shadow: 0 3px 12px rgba(0, 0, 0, 0.6);
-            margin-bottom: 4px;
+            text-shadow: 0 3px 12px rgba(0, 0, 0, 0.7);
+            margin-bottom: 2px;
             letter-spacing: -0.5px;
         }
 
+        .sub-faculty {
+            font-size: 1.15rem;
+            color: var(--gold-primary);
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
         .sub-title {
-            font-size: 1.05rem;
+            font-size: 1.02rem;
             color: var(--text-muted);
             font-weight: 500;
         }
@@ -132,7 +138,7 @@
         /* Dashboard Stats Cards */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
             gap: 16px;
         }
 
@@ -141,11 +147,11 @@
             border: 1px solid var(--border-gold);
             backdrop-filter: blur(12px);
             border-radius: var(--radius-main);
-            padding: 20px;
+            padding: 18px 20px;
             box-shadow: var(--shadow-lg);
             display: flex;
             align-items: center;
-            gap: 18px;
+            gap: 16px;
             transition: all 0.3s ease;
         }
 
@@ -156,8 +162,8 @@
         }
 
         .stat-icon {
-            width: 56px;
-            height: 56px;
+            width: 54px;
+            height: 54px;
             border-radius: 14px;
             background: rgba(201, 162, 39, 0.15);
             border: 1px solid var(--border-gold);
@@ -165,25 +171,25 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.6rem;
+            font-size: 1.5rem;
             flex-shrink: 0;
         }
 
         .stat-info {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 2px;
             overflow: hidden;
         }
 
         .stat-title {
-            font-size: 0.88rem;
+            font-size: 0.86rem;
             color: var(--text-muted);
             font-weight: 600;
         }
 
         .stat-value {
-            font-size: 1.45rem;
+            font-size: 1.4rem;
             font-weight: 800;
             color: var(--text-light);
             white-space: nowrap;
@@ -213,7 +219,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            padding-left: 10px;
+            padding-left: 12px;
             border-left: 2px solid var(--border-gold);
         }
 
@@ -247,10 +253,10 @@
         }
 
         .day-badge {
-            padding: 2px 7px;
+            padding: 2px 8px;
             border-radius: 10px;
             font-size: 0.78rem;
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(0, 0, 0, 0.35);
             color: var(--text-light);
         }
 
@@ -276,7 +282,7 @@
 
         .search-box {
             position: relative;
-            flex: 1 1 260px;
+            flex: 1 1 240px;
         }
 
         .search-box i {
@@ -358,6 +364,18 @@
             box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
         }
 
+        .btn-info {
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
+        }
+
+        .btn-info:hover {
+            background: linear-gradient(135deg, #38bdf8 0%, #0369a1 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(14, 165, 233, 0.4);
+        }
+
         .btn-secondary {
             background: rgba(255, 255, 255, 0.08);
             color: var(--text-light);
@@ -391,7 +409,6 @@
             font-weight: 600;
             background: rgba(0, 0, 0, 0.4);
             border: 1px solid var(--border-soft);
-            cursor: pointer;
         }
 
         .status-dot {
@@ -677,7 +694,7 @@
             font-weight: 600;
         }
 
-        /* Modal Dialogs Layout & Flex Scroll Fix */
+        /* Modal Dialogs */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -727,7 +744,6 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-shrink: 0;
         }
 
         .modal-title {
@@ -752,31 +768,12 @@
             color: var(--danger);
         }
 
-        .modal-card form {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            min-height: 0;
-            overflow: hidden;
-        }
-
         .modal-body {
             padding: 24px;
             display: flex;
             flex-direction: column;
             gap: 16px;
             overflow-y: auto;
-            flex: 1;
-        }
-
-        .modal-footer {
-            padding: 16px 24px;
-            display: flex;
-            gap: 12px;
-            justify-content: flex-end;
-            border-top: 1px solid var(--border-gold);
-            background: #081c36;
-            flex-shrink: 0;
         }
 
         .form-group {
@@ -819,6 +816,14 @@
             min-height: 80px;
         }
 
+        .modal-footer {
+            padding: 16px 24px 20px 24px;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            border-top: 1px solid var(--border-soft);
+        }
+
         /* Toast Notifications */
         .toast-container {
             position: fixed;
@@ -849,18 +854,53 @@
             to { transform: translateX(0); opacity: 1; }
         }
 
-        /* Footer */
+        .col-manage-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 280px;
+            overflow-y: auto;
+        }
+
+        .col-manage-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(4, 12, 24, 0.6);
+            border: 1px solid var(--border-soft);
+            padding: 10px 14px;
+            border-radius: 10px;
+        }
+
+        .col-manage-label {
+            font-weight: 700;
+            color: var(--gold-light);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .col-manage-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
         footer {
             text-align: center;
             color: var(--text-muted);
-            font-size: 0.85rem;
+            font-size: 0.88rem;
             margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-soft);
         }
 
-        /* Responsive Design */
         @media (max-width: 768px) {
             .main-title {
-                font-size: 2rem;
+                font-size: 2.1rem;
+            }
+            .sub-faculty {
+                font-size: 1rem;
             }
             .controls-card {
                 flex-direction: column;
@@ -873,12 +913,126 @@
                 flex: 1 1 auto;
             }
             .club-logo {
-                width: 110px;
-                height: 110px;
+                width: 120px;
+                height: 120px;
             }
             table.custom-table th, table.custom-table td {
                 padding: 10px 12px;
                 font-size: 0.88rem;
+            }
+        }
+
+        @media print {
+            @page {
+                size: A4 landscape;
+                margin: 10mm;
+            }
+
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+                padding: 0 !important;
+                font-size: 11pt !important;
+            }
+
+            .container {
+                max-width: 100% !important;
+                gap: 10px !important;
+            }
+
+            .no-print, 
+            .stats-grid, 
+            .days-nav-card, 
+            .controls-card, 
+            footer, 
+            .toast-container,
+            .modal-overlay,
+            .no-export,
+            .col-tools {
+                display: none !important;
+            }
+
+            header.app-header {
+                padding: 5px 0 15px 0 !important;
+                border-bottom: 2px solid #c9a227 !important;
+                margin-bottom: 15px !important;
+            }
+
+            .club-logo {
+                width: 90px !important;
+                height: 90px !important;
+                filter: none !important;
+            }
+
+            .main-title {
+                color: #040c18 !important;
+                font-size: 1.8rem !important;
+                text-shadow: none !important;
+            }
+
+            .sub-faculty {
+                color: #997819 !important;
+                font-size: 1.05rem !important;
+            }
+
+            .sub-title {
+                color: #334155 !important;
+                font-size: 0.9rem !important;
+            }
+
+            .table-card {
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+            }
+
+            #exportContainer {
+                background: transparent !important;
+                padding: 0 !important;
+            }
+
+            .table-responsive {
+                border: 1px solid #000000 !important;
+                overflow: visible !important;
+            }
+
+            table.custom-table {
+                background: #ffffff !important;
+                width: 100% !important;
+                border-collapse: collapse !important;
+            }
+
+            table.custom-table th {
+                background: #f1f5f9 !important;
+                color: #0f172a !important;
+                border: 1px solid #000000 !important;
+                padding: 8px 10px !important;
+                font-size: 10pt !important;
+                text-align: right !important;
+            }
+
+            table.custom-table td {
+                color: #000000 !important;
+                border: 1px solid #64748b !important;
+                padding: 8px 10px !important;
+                font-size: 9.5pt !important;
+            }
+
+            .badge-day, .badge-council, .badge-location {
+                background: transparent !important;
+                border: none !important;
+                color: #000000 !important;
+                padding: 0 !important;
+                font-weight: bold !important;
+            }
+
+            table.custom-table thead {
+                display: table-header-group !important;
+            }
+
+            table.custom-table tr {
+                page-break-inside: avoid !important;
             }
         }
     </style>
@@ -891,12 +1045,13 @@
             <div class="logo-container">
                 <img src="logo.png" alt="شعار نادي جسور" class="club-logo" id="mainClubLogo">
             </div>
-            <h1 class="main-title">معدات المنشطين</h1>
-            <p class="sub-title">نادي جسور — كلية العلوم الإسلامية – جامعة الجزائر 1 (نحو أفق الفكر والمعرفة)</p>
+            <h1 class="main-title">نادي جسور</h1>
+            <div class="sub-faculty">كلية العلوم الإسلامية – جامعة الجزائر 1</div>
+            <p class="sub-title">جدول إدارة وتوزيع معدات المنشطين للمجالس الأسبوعية</p>
         </header>
 
         <!-- Dashboard Stats Cards Section -->
-        <div class="stats-grid">
+        <div class="stats-grid no-print">
             <div class="stat-card">
                 <div class="stat-icon"><i class="fa-solid fa-boxes-stacked"></i></div>
                 <div class="stat-info">
@@ -922,8 +1077,8 @@
             </div>
         </div>
 
-        <!-- Days Navigation Tabs (Excluding Friday as requested) -->
-        <div class="days-nav-card">
+        <!-- Days Navigation Tabs (Excluding Friday by default) -->
+        <div class="days-nav-card no-print">
             <div class="days-nav-title"><i class="fa-solid fa-calendar-days"></i> الأيام:</div>
             <button class="day-tab active" onclick="filterByDay('all', this)">
                 <span>كل الأيام</span> <span class="day-badge" id="badge-all">0</span>
@@ -949,34 +1104,42 @@
         </div>
 
         <!-- Controls Toolbar -->
-        <div class="controls-card">
+        <div class="controls-card no-print">
             <!-- Search Box -->
             <div class="search-box">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="searchInput" class="search-input" placeholder="ابحث في أي عمود أو مجال..." oninput="handleSearch()">
+                <input type="text" id="searchInput" class="search-input" placeholder="ابحث في كافة البيانات والمعدات..." oninput="handleSearch()">
             </div>
 
             <!-- Action Buttons & Status -->
             <div class="action-buttons">
-                <div class="status-badge" id="dbStatusBadge" onclick="openBackendModal()" title="حالة الاتصال - انقر للتفاصيل والضبط">
+                <div class="status-badge" id="dbStatusBadge" title="حالة الاتصال بقاعدة البيانات">
                     <span class="status-dot" id="dbStatusDot"></span>
-                    <span id="dbStatusText">جاري الفحص...</span>
+                    <span id="dbStatusText">Cloud Firestore 🔥 (josour-djard)</span>
                 </div>
 
+                <button class="btn btn-primary" onclick="openAddModal()">
+                    <i class="fa-solid fa-plus"></i> إضافة صف
+                </button>
+
                 <button class="btn btn-outline-gold" onclick="openAddColumnModal()">
-                    <i class="fa-solid fa-columns"></i> إضافة عمود جديد
+                    <i class="fa-solid fa-columns"></i> إضافة عمود
                 </button>
 
                 <button class="btn btn-secondary" onclick="openManageColumnsModal()">
                     <i class="fa-solid fa-sliders"></i> إدارة الأعمدة
                 </button>
 
-                <button class="btn btn-primary" onclick="openAddModal()">
-                    <i class="fa-solid fa-plus-circle"></i> إضافة مجلس جديد
+                <button class="btn btn-info" onclick="printTable()">
+                    <i class="fa-solid fa-print"></i> طباعة
                 </button>
 
                 <button class="btn btn-success" onclick="exportTablePNG()">
-                    <i class="fa-solid fa-file-image"></i> تحميل الجدول (PNG)
+                    <i class="fa-solid fa-file-image"></i> تصدير (PNG)
+                </button>
+
+                <button class="btn btn-secondary" onclick="openBackendModal()" title="إعدادات قاعدة البيانات">
+                    <i class="fa-solid fa-database"></i>
                 </button>
             </div>
         </div>
@@ -984,40 +1147,41 @@
         <!-- Main Table Container -->
         <div class="table-card">
             <div id="exportContainer">
-                <!-- PNG Export Header (Visible only in PNG output) -->
+                <!-- PNG Export Header (Visible only in PNG export) -->
                 <div class="export-header" id="exportHeader">
                     <img src="logo.png" alt="شعار نادي جسور">
-                    <h2>معدات المنشطين</h2>
-                    <p id="exportSubtitle">جدول متابعة معدات المنشطين بالمجالس — نادي جسور</p>
+                    <h2>نادي جسور</h2>
+                    <p class="sub-faculty">كلية العلوم الإسلامية – جامعة الجزائر 1</p>
+                    <p id="exportSubtitle">جدول إدارة وتوزيع معدات المنشطين للمجالس الأسبوعية</p>
                 </div>
 
-                <!-- Fully Dynamic Data Table -->
+                <!-- Editable Data Table -->
                 <div class="table-responsive">
                     <table class="custom-table" id="equipmentTable">
                         <thead>
                             <tr id="tableHeaderRow">
-                                <!-- Dynamic Th Headers populated via JS -->
+                                <!-- Dynamic headers generated via JavaScript -->
                             </tr>
                         </thead>
                         <tbody id="tableBody">
-                            <!-- Dynamic Rows populated via JS -->
+                            <!-- Rows dynamically populated -->
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <footer>
+        <footer class="no-print">
             جميع الحقوق محفوظة © نادي جسور — كلية العلوم الإسلامية – جامعة الجزائر 1 (نحو أفق الفكر والمعرفة)
         </footer>
     </div>
 
-    <!-- Add/Edit Council Row Modal -->
+    <!-- Add/Edit Council Modal -->
     <div class="modal-overlay" id="councilModal">
         <div class="modal-card">
             <div class="modal-header">
                 <h3 class="modal-title" id="modalTitle">
-                    <i class="fa-solid fa-plus-circle"></i> <span>إضافة مجلس جديد</span>
+                    <i class="fa-solid fa-pen-to-square"></i> <span>إضافة صف جديد</span>
                 </h3>
                 <button class="close-modal" type="button" onclick="closeCouncilModal()">
                     <i class="fa-solid fa-xmark"></i>
@@ -1031,7 +1195,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="closeCouncilModal()">إلغاء</button>
                     <button type="submit" class="btn btn-primary" id="saveBtn">
-                        <i class="fa-solid fa-plus-circle"></i> <span>إضافة المجلس الآن</span>
+                        <i class="fa-solid fa-floppy-disk"></i> حفظ البيانات
                     </button>
                 </div>
             </form>
@@ -1043,7 +1207,7 @@
         <div class="modal-card" style="max-width: 480px;">
             <div class="modal-header">
                 <h3 class="modal-title">
-                    <i class="fa-solid fa-columns"></i> إضافة عمود جديد للجدول
+                    <i class="fa-solid fa-columns"></i> إضافة عمود جديد
                 </h3>
                 <button class="close-modal" type="button" onclick="closeAddColumnModal()">
                     <i class="fa-solid fa-xmark"></i>
@@ -1052,19 +1216,12 @@
             <form id="addColumnForm" onsubmit="handleAddColumn(event)">
                 <div class="modal-body">
                     <p style="font-size: 0.9rem; color: var(--text-muted);">
-                        أدخل عنوان العمود الجديد للجدول (مثال: "حالة المعدات"، "عدد القطع"، "اسم المسؤول").
+                        أدخل عنوان العمود الجديد للجدول (مثال: "حالة المعدات"، "عدد القطع"، "وقت التسليم"، "اسم المسؤول").
                     </p>
                     <div class="form-group">
-                        <label for="newColumnName"><i class="fa-solid fa-heading"></i> اسم العمود الجديد</label>
+                        <label for="newColumnName"><i class="fa-solid fa-heading"></i> عنوان العمود</label>
                         <input type="text" id="newColumnName" class="form-control" placeholder="مثال: حالة المعدات..." required autocomplete="off" oninput="clearColAddError()">
                         <div id="colAddError" style="display:none; color:#ef4444; background: rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.4); padding:10px 14px; border-radius:10px; font-size:0.88rem; font-weight:600; margin-top:8px;"></div>
-                    </div>
-                    <div class="form-group">
-                        <label for="newColumnType"><i class="fa-solid fa-list-check"></i> نوع إدخال العمود</label>
-                        <select id="newColumnType" class="form-control">
-                            <option value="text">نص عادي (سطر واحد)</option>
-                            <option value="textarea">نص متعدد الأسطر (قائمة/ملاحظات)</option>
-                        </select>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -1077,29 +1234,32 @@
         </div>
     </div>
 
-    <!-- Manage Columns Modal -->
+    <!-- Manage Columns Modal (Rename, Reorder, Delete) -->
     <div class="modal-overlay" id="manageColumnsModal">
-        <div class="modal-card" style="max-width: 520px;">
+        <div class="modal-card" style="max-width: 540px;">
             <div class="modal-header">
                 <h3 class="modal-title">
-                    <i class="fa-solid fa-sliders"></i> إدارة أعمدة الجدول
+                    <i class="fa-solid fa-sliders"></i> إدارة وتعديل الأعمدة
                 </h3>
                 <button class="close-modal" type="button" onclick="closeManageColumnsModal()">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
-            <div class="modal-body" id="manageColumnsList">
-                <!-- Columns reorder & rename list populated via JS -->
+            <div class="modal-body">
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 8px;">
+                    يمكنك إعادة تسمية أي عمود، تغيير ترتيب الأعمدة، أو حذف الأعمدة المضافة.
+                </p>
+                <div class="col-manage-list" id="colManageList">
+                    <!-- Dynamic column manage list rendered here -->
+                </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" onclick="closeManageColumnsModal()">
-                    <i class="fa-solid fa-check"></i> إنهاء الإدارة
-                </button>
+                <button type="button" class="btn btn-primary" onclick="closeManageColumnsModal()">تم الإنتهاء</button>
             </div>
         </div>
     </div>
 
-    <!-- Confirm Delete Modal (Row or Column) -->
+    <!-- Confirm Delete Modal -->
     <div class="modal-overlay" id="deleteModal">
         <div class="modal-card" style="max-width: 440px;">
             <div class="modal-header">
@@ -1111,11 +1271,11 @@
                 </button>
             </div>
             <div class="modal-body">
-                <p id="deleteModalText" style="font-size: 1rem; color: #e2e8f0; line-height: 1.6;">
-                    هل أنت تأكد من رغبتك في حذف بيانات هذا المجلس نهائياً؟ لا يمكن التراجع عن هذا الإجراء.
+                <p style="font-size: 1rem; color: #e2e8f0; line-height: 1.6;" id="deleteModalText">
+                    هل أنت تأكد من رغبتك في حذف هذا الصف؟ لا يمكن التراجع عن هذا الإجراء.
                 </p>
                 <input type="hidden" id="deleteTargetId">
-                <input type="hidden" id="deleteTargetType">
+                <input type="hidden" id="deleteTargetType" value="row">
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()">إلغاء</button>
@@ -1126,26 +1286,25 @@
         </div>
     </div>
 
-    <!-- Backend / Firebase Modal -->
+    <!-- Firebase Settings Modal -->
     <div class="modal-overlay" id="backendModal">
         <div class="modal-card">
             <div class="modal-header">
                 <h3 class="modal-title">
-                    <i class="fa-solid fa-database"></i> إعدادات قاعدة البيانات (Firebase josour-djard)
+                    <i class="fa-solid fa-database"></i> إعدادات Cloud Firestore
                 </h3>
                 <button class="close-modal" type="button" onclick="closeBackendModal()">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
             <div class="modal-body">
-                <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid var(--success); padding: 12px; border-radius: 10px; font-size: 0.88rem; line-height: 1.5; color: #e2e8f0;">
-                    <i class="fa-solid fa-circle-check" style="color: var(--success);"></i> 
-                    التطبيق متصل حياً بمشروع <b>Firebase</b> الرسمية: <code>josour-djard</code>.
-                </div>
+                <p style="font-size: 0.9rem; color: var(--text-muted);">
+                    التطبيق متصل بمشروع Firebase الرسمي الخاص بك (<b>josour-djard</b>).
+                </p>
 
-                <div class="form-group" style="margin-top: 10px;">
+                <div class="form-group">
                     <label for="fbConfigJson"><i class="fa-fire fab" style="color:#f59e0b;"></i> Firebase SDK Config (JSON)</label>
-                    <textarea id="fbConfigJson" class="form-control" rows="6" style="font-family: monospace; font-size: 0.8rem;"></textarea>
+                    <textarea id="fbConfigJson" class="form-control" rows="6"></textarea>
                 </div>
             </div>
             <div class="modal-footer">
@@ -1166,7 +1325,6 @@
         const officialFirebaseConfig = {
             apiKey: "AIzaSyAYdprBxSxDf_2mUve4EY7t5jDgo_2_Lb4",
             authDomain: "josour-djard.firebaseapp.com",
-            databaseURL: "https://josour-djard-default-rtdb.firebaseio.com",
             projectId: "josour-djard",
             storageBucket: "josour-djard.firebasestorage.app",
             messagingSenderId: "830517852419",
@@ -1174,189 +1332,90 @@
             measurementId: "G-B1VH7QBJHP"
         };
 
-        // Default Initial Columns Schema
-        const defaultColumnsSchema = [
-            { id: 'col_day', name: 'اليوم', type: 'select', isDefault: true },
-            { id: 'col_council', name: 'اسم المجلس', type: 'text', isDefault: true },
-            { id: 'col_facilitator', name: 'المنشط الرئيسي', type: 'text', isDefault: true },
-            { id: 'col_equipment', name: 'المعدات المستعملة', type: 'textarea', isDefault: true },
-            { id: 'col_location', name: 'المكان', type: 'text', isDefault: true },
-            { id: 'col_status', name: 'حالة المعدات', type: 'text', isDefault: false }
+        // Default Initial Columns Structure (100% Dynamic)
+        const defaultColumns = [
+            { id: 'col_day', name: 'اليوم', type: 'day', fixed: true },
+            { id: 'col_council', name: 'اسم المجلس', type: 'text', fixed: false },
+            { id: 'col_facilitator', name: 'اسم المنشط الرئيسي', type: 'text', fixed: false },
+            { id: 'col_location', name: 'مكان المجلس', type: 'text', fixed: false },
+            { id: 'col_equipment', name: 'المعدات', type: 'textarea', fixed: false },
+            { id: 'col_notes', name: 'ملاحظات', type: 'text', fixed: false }
         ];
 
         // Default Initial Sample Data across non-Friday days
         const initialSampleData = [
             {
-                id: 'sample-1',
                 col_day: 'السبت',
                 col_council: 'مجلس الابتكار والتقنية',
                 col_facilitator: 'أحمد المنصور',
-                col_equipment: 'جهاز عرض HD، مكبر صوت لاسلكي، 20 لوحة تفاعلية',
                 col_location: 'قاعة العلامة بن باديس',
-                col_status: 'ممتازة 🟢'
+                col_equipment: 'جهاز عرض HD، مكبر صوت لاسلكي، 20 لوحة تفاعلية',
+                col_notes: 'جاهز ومعاين 🟢'
             },
             {
-                id: 'sample-2',
                 col_day: 'الأحد',
                 col_council: 'مجلس الريادة والقيادة',
                 col_facilitator: 'سارة الإبراهيمي',
-                col_equipment: 'حاسوب محمول، شاشة ذكية، 2 ميكروفون يدوي',
                 col_location: 'قاعة الاجتماعات الكبرى',
-                col_status: 'جاهزة 🟢'
+                col_equipment: 'حاسوب محمول، شاشة ذكية، 2 ميكروفون يدوي',
+                col_notes: 'جاهز 🟢'
             },
             {
-                id: 'sample-3',
                 col_day: 'الإثنين',
                 col_council: 'مجلس الفكر والمعرفة',
                 col_facilitator: 'ياسين القاسمي',
-                col_equipment: 'حقيبة الورشات، منصة إلقاء، كشافات إضاءة',
                 col_location: 'المكتبة المركزية',
-                col_status: 'جاهزة 🟢'
+                col_equipment: 'حقيبة الورشات، منصة إلقاء، كشافات إضاءة',
+                col_notes: 'تم التسليم 🟢'
             },
             {
-                id: 'sample-4',
                 col_day: 'الثلاثاء',
                 col_council: 'مجلس التطور والإعلام',
                 col_facilitator: 'أحمد المنصور',
-                col_equipment: 'كاميرا تصوير 4K، حامل ثلاثي، 2 إضاءة ليد',
                 col_location: 'استوديو الإبداع',
-                col_status: 'تحت الصيانة 🟡'
+                col_equipment: 'كاميرا تصوير 4K، حامل ثلاثي، 2 إضاءة ليد',
+                col_notes: 'تحت الصيانة 🟡'
             },
             {
-                id: 'sample-5',
                 col_day: 'الأربعاء',
                 col_council: 'مجلس العلوم والاستكشاف',
                 col_facilitator: 'مريم التميمي',
-                col_equipment: 'مجهر إلكتروني، لوحات عرض تجارب',
                 col_location: 'المخبر العلمي',
-                col_status: 'ممتازة 🟢'
+                col_equipment: 'مجهر إلكتروني، لوحات عرض تجارب',
+                col_notes: 'جاهز 🟢'
             },
             {
-                id: 'sample-6',
                 col_day: 'الخميس',
                 col_council: 'مجلس التخطيط والمشاريع',
                 col_facilitator: 'ياسين القاسمي',
-                col_equipment: 'جهاز عرض بروجكتور، سبورة ذكية',
                 col_location: 'قاعة الاجتماعات الكبرى',
-                col_status: 'جاهزة 🟢'
+                col_equipment: 'جهاز عرض بروجكتور، سبورة ذكية',
+                col_notes: 'جاهز 🟢'
             }
         ];
 
-        // Application State Variables
+        // Application State
         let columnsSchema = [];
         let councilsData = [];
-        let activeDayFilter = 'all';
+        let activeDayFilter = 'all'; // Current day tab
         let firestoreDb = null;
-        let realtimeDb = null;
         let activeBackend = 'firebase';
-        let activeEditCell = null;
+        let activeEditCell = null; // Cell currently in inline editing mode
 
-        // App Initialization
+        // Initialization
         document.addEventListener('DOMContentLoaded', async () => {
-            loadColumnsSchema();
             initBackendClient();
+            loadColumnsSchema();
             await loadCouncilsData();
         });
 
-        // Columns Schema Management
-        function loadColumnsSchema() {
-            const storedSchema = localStorage.getItem('columns_schema_v3');
-            if (storedSchema) {
-                try { columnsSchema = JSON.parse(storedSchema); } catch(e) { columnsSchema = [...defaultColumnsSchema]; }
-            } else {
-                columnsSchema = [...defaultColumnsSchema];
-                saveColumnsSchema();
-            }
-            renderTableHeader();
-        }
-
-        function saveColumnsSchema() {
-            localStorage.setItem('columns_schema_v3', JSON.stringify(columnsSchema));
-        }
-
-        function renderTableHeader() {
-            const tr = document.getElementById('tableHeaderRow');
-            if (!tr) return;
-            tr.innerHTML = '';
-
-            // Index column
-            const thIndex = document.createElement('th');
-            thIndex.style.width = '45px';
-            thIndex.textContent = '#';
-            tr.appendChild(thIndex);
-
-            // Dynamic columns
-            columnsSchema.forEach((col, index) => {
-                const th = document.createElement('th');
-                const titleDiv = document.createElement('div');
-                titleDiv.className = 'th-content';
-                
-                const spanName = document.createElement('span');
-                spanName.textContent = col.name;
-                titleDiv.appendChild(spanName);
-
-                // Column tools
-                const toolsDiv = document.createElement('div');
-                toolsDiv.className = 'col-tools';
-
-                if (index > 0) {
-                    const btnMoveLeft = document.createElement('button');
-                    btnMoveLeft.type = 'button';
-                    btnMoveLeft.className = 'col-btn';
-                    btnMoveLeft.title = 'تحريك لليمين';
-                    btnMoveLeft.innerHTML = '<i class="fa-solid fa-chevron-right"></i>';
-                    btnMoveLeft.onclick = (e) => { e.stopPropagation(); moveColumn(index, -1); };
-                    toolsDiv.appendChild(btnMoveLeft);
-                }
-
-                if (index < columnsSchema.length - 1) {
-                    const btnMoveRight = document.createElement('button');
-                    btnMoveRight.type = 'button';
-                    btnMoveRight.className = 'col-btn';
-                    btnMoveRight.title = 'تحريك لليسار';
-                    btnMoveRight.innerHTML = '<i class="fa-solid fa-chevron-left"></i>';
-                    btnMoveRight.onclick = (e) => { e.stopPropagation(); moveColumn(index, 1); };
-                    toolsDiv.appendChild(btnMoveRight);
-                }
-
-                const btnRename = document.createElement('button');
-                btnRename.type = 'button';
-                btnRename.className = 'col-btn';
-                btnRename.title = 'إعادة تسمية العمود';
-                btnRename.innerHTML = '<i class="fa-solid fa-pen"></i>';
-                btnRename.onclick = (e) => { e.stopPropagation(); promptRenameColumn(col.id); };
-                toolsDiv.appendChild(btnRename);
-
-                if (!col.isDefault) {
-                    const btnDel = document.createElement('button');
-                    btnDel.type = 'button';
-                    btnDel.className = 'col-btn col-btn-del';
-                    btnDel.title = 'حذف العمود';
-                    btnDel.innerHTML = '<i class="fa-solid fa-trash"></i>';
-                    btnDel.onclick = (e) => { e.stopPropagation(); openDeleteModalForColumn(col.id, col.name); };
-                    toolsDiv.appendChild(btnDel);
-                }
-
-                titleDiv.appendChild(toolsDiv);
-                th.appendChild(titleDiv);
-                tr.appendChild(th);
-            });
-
-            // Actions column
-            const thActions = document.createElement('th');
-            thActions.className = 'no-print';
-            thActions.style.width = '100px';
-            thActions.textContent = 'الإجراءات';
-            tr.appendChild(thActions);
-        }
-
-        // Backend Initialization
+        // Firestore & Backend Initialization
         function initBackendClient() {
             const savedFbConfig = localStorage.getItem('firebase_config');
             const cfg = savedFbConfig ? JSON.parse(savedFbConfig) : officialFirebaseConfig;
             
-            const fbConfigEl = document.getElementById('fbConfigJson');
-            if (fbConfigEl) fbConfigEl.value = JSON.stringify(cfg, null, 2);
+            const textarea = document.getElementById('fbConfigJson');
+            if (textarea) textarea.value = JSON.stringify(cfg, null, 2);
 
             if (window.firebase) {
                 try {
@@ -1364,9 +1423,8 @@
                         firebase.initializeApp(cfg);
                     }
                     firestoreDb = firebase.firestore();
-                    realtimeDb = firebase.database();
                     activeBackend = 'firebase';
-                    updateDbStatusUI(true, 'Firebase متصل 🔥 (josour-djard)');
+                    updateDbStatusUI(true, 'Cloud Firestore 🔥 (josour-djard)');
                     return;
                 } catch(e) {
                     console.error('Firebase init error:', e);
@@ -1384,26 +1442,297 @@
             if (statusText) statusText.textContent = text;
         }
 
-        // Data Sync & Loading Logic Fix (Prevents deleted sample councils from re-appearing)
+        // Columns Schema Management & Sync
+        function loadColumnsSchema() {
+            const storedSchema = localStorage.getItem('columns_schema_v3');
+            if (storedSchema) {
+                try { columnsSchema = JSON.parse(storedSchema); } catch(e) { columnsSchema = [...defaultColumns]; }
+            } else {
+                columnsSchema = [...defaultColumns];
+                saveColumnsSchemaLocally();
+            }
+
+            if (activeBackend === 'firebase' && firestoreDb) {
+                firestoreDb.collection('equipment_schedule').doc('table_config')
+                    .onSnapshot((doc) => {
+                        if (doc.exists && doc.data().columns) {
+                            columnsSchema = doc.data().columns;
+                            saveColumnsSchemaLocally();
+                            renderTableHeader();
+                            renderTable(getFilteredData());
+                        } else {
+                            saveColumnsSchemaToFirestore();
+                        }
+                    }, (err) => {
+                        console.warn('Firestore table_config snapshot listener warning:', err);
+                    });
+            }
+
+            renderTableHeader();
+        }
+
+        function saveColumnsSchemaLocally() {
+            localStorage.setItem('columns_schema_v3', JSON.stringify(columnsSchema));
+        }
+
+        async function saveColumnsSchemaToFirestore() {
+            saveColumnsSchemaLocally();
+            if (activeBackend === 'firebase' && firestoreDb) {
+                try {
+                    await firestoreDb.collection('equipment_schedule').doc('table_config').set({
+                        columns: columnsSchema,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+                } catch(err) {
+                    console.error('Error saving columns to Firestore:', err);
+                }
+            }
+        }
+
+        // Render Table Header Row based on columnsSchema
+        function renderTableHeader() {
+            const headerRow = document.getElementById('tableHeaderRow');
+            headerRow.innerHTML = '';
+
+            // Index column
+            const thNum = document.createElement('th');
+            thNum.style.width = '45px';
+            thNum.textContent = '#';
+            headerRow.appendChild(thNum);
+
+            // Dynamic columns
+            columnsSchema.forEach((col, index) => {
+                const th = document.createElement('th');
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'th-content';
+                
+                const titleSpan = document.createElement('span');
+                titleSpan.textContent = col.name;
+                contentDiv.appendChild(titleSpan);
+
+                const toolsDiv = document.createElement('div');
+                toolsDiv.className = 'col-tools no-print';
+
+                // Move left button
+                if (index > 0) {
+                    const btnMoveLeft = document.createElement('button');
+                    btnMoveLeft.type = 'button';
+                    btnMoveLeft.className = 'col-btn';
+                    btnMoveLeft.title = 'تحريك يميناً';
+                    btnMoveLeft.innerHTML = '<i class="fa-solid fa-chevron-right"></i>';
+                    btnMoveLeft.onclick = (e) => { e.stopPropagation(); moveColumn(index, -1); };
+                    toolsDiv.appendChild(btnMoveLeft);
+                }
+
+                // Move right button
+                if (index < columnsSchema.length - 1) {
+                    const btnMoveRight = document.createElement('button');
+                    btnMoveRight.type = 'button';
+                    btnMoveRight.className = 'col-btn';
+                    btnMoveRight.title = 'تحريك يساراً';
+                    btnMoveRight.innerHTML = '<i class="fa-solid fa-chevron-left"></i>';
+                    btnMoveRight.onclick = (e) => { e.stopPropagation(); moveColumn(index, 1); };
+                    toolsDiv.appendChild(btnMoveRight);
+                }
+
+                // Rename button
+                const btnRename = document.createElement('button');
+                btnRename.type = 'button';
+                btnRename.className = 'col-btn';
+                btnRename.title = 'إعادة التسمية';
+                btnRename.innerHTML = '<i class="fa-solid fa-pen"></i>';
+                btnRename.onclick = (e) => { e.stopPropagation(); promptRenameColumn(col.id); };
+                toolsDiv.appendChild(btnRename);
+
+                // Delete column button (if not fixed or default day)
+                if (col.id !== 'col_day') {
+                    const btnDel = document.createElement('button');
+                    btnDel.type = 'button';
+                    btnDel.className = 'col-btn col-btn-del';
+                    btnDel.title = 'حذف العمود';
+                    btnDel.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+                    btnDel.onclick = (e) => { e.stopPropagation(); openDeleteModalForColumn(col.id, col.name); };
+                    toolsDiv.appendChild(btnDel);
+                }
+
+                contentDiv.appendChild(toolsDiv);
+                th.appendChild(contentDiv);
+                headerRow.appendChild(th);
+            });
+
+            // Action column
+            const thActions = document.createElement('th');
+            thActions.className = 'no-print';
+            thActions.style.width = '90px';
+            thActions.textContent = 'الإجراءات';
+            headerRow.appendChild(thActions);
+        }
+
+        // Column Movement & Modification
+        async function moveColumn(index, direction) {
+            const targetIndex = index + direction;
+            if (targetIndex < 0 || targetIndex >= columnsSchema.length) return;
+
+            const temp = columnsSchema[index];
+            columnsSchema[index] = columnsSchema[targetIndex];
+            columnsSchema[targetIndex] = temp;
+
+            renderTableHeader();
+            renderTable(getFilteredData());
+            await saveColumnsSchemaToFirestore();
+        }
+
+        async function promptRenameColumn(colId) {
+            const col = columnsSchema.find(c => c.id === colId);
+            if (!col) return;
+
+            const newName = prompt('أدخل الاسم الجديد للعمود:', col.name);
+            if (newName && newName.trim() && newName.trim() !== col.name) {
+                col.name = newName.trim();
+                renderTableHeader();
+                renderTable(getFilteredData());
+                await saveColumnsSchemaToFirestore();
+                showToast('تمت إعادة تسمية العمود إلى "' + col.name + '"');
+            }
+        }
+
+        function clearColAddError() {
+            const errDiv = document.getElementById('colAddError');
+            if (errDiv) {
+                errDiv.style.display = 'none';
+                errDiv.textContent = '';
+            }
+            const inputEl = document.getElementById('newColumnName');
+            if (inputEl) {
+                inputEl.style.borderColor = '';
+            }
+        }
+
+        function openAddColumnModal() {
+            const input = document.getElementById('newColumnName');
+            if (input) input.value = '';
+            clearColAddError();
+            document.getElementById('addColumnModal').classList.add('active');
+            setTimeout(() => {
+                if (input) input.focus();
+            }, 100);
+        }
+
+        function closeAddColumnModal() {
+            document.getElementById('addColumnModal').classList.remove('active');
+            clearColAddError();
+        }
+
+        async function handleAddColumn(e) {
+            if (e && e.preventDefault) e.preventDefault();
+
+            clearColAddError();
+            const inputEl = document.getElementById('newColumnName');
+            const errDiv = document.getElementById('colAddError');
+            const name = inputEl ? inputEl.value.trim() : '';
+
+            if (!name) {
+                if (errDiv) {
+                    errDiv.textContent = '⚠️ يرجى إدخال اسم العمود المُراد إضافته.';
+                    errDiv.style.display = 'block';
+                }
+                if (inputEl) inputEl.style.borderColor = '#ef4444';
+                return;
+            }
+
+            // Check if column already exists
+            const existingCol = columnsSchema.find(c => c.name.trim().toLowerCase() === name.toLowerCase());
+            if (existingCol) {
+                if (errDiv) {
+                    errDiv.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> العمود <b>"' + escapeHtml(name) + '"</b> موجود بالفعل في الجدول! يرجى إدخال عنوان عمود جديد (مثال: "حالة المعدات"، "عدد القطع").';
+                    errDiv.style.display = 'block';
+                }
+                if (inputEl) inputEl.style.borderColor = '#ef4444';
+                showToast('العمود "' + name + '" موجود بالفعل!', 'warning');
+                return;
+            }
+
+            const colId = 'col_' + Date.now();
+            columnsSchema.push({
+                id: colId,
+                name: name,
+                type: 'text',
+                fixed: false
+            });
+
+            saveColumnsSchemaLocally();
+            renderTableHeader();
+            renderTable(getFilteredData());
+            closeAddColumnModal();
+            
+            showToast('تمت إضافة العمود "' + name + '" بنجاح!');
+            
+            await saveColumnsSchemaToFirestore();
+        }
+
+        function openManageColumnsModal() {
+            const listContainer = document.getElementById('colManageList');
+            listContainer.innerHTML = '';
+
+            columnsSchema.forEach((col, index) => {
+                const item = document.createElement('div');
+                item.className = 'col-manage-item';
+
+                let actionsHtml = '';
+                if (index > 0) {
+                    actionsHtml += '<button type="button" class="btn-icon" onclick="moveColumn(' + index + ', -1)" title="أعلى/يمين"><i class="fa-solid fa-arrow-up"></i></button>';
+                }
+                if (index < columnsSchema.length - 1) {
+                    actionsHtml += '<button type="button" class="btn-icon" onclick="moveColumn(' + index + ', 1)" title="أسفل/يسار"><i class="fa-solid fa-arrow-down"></i></button>';
+                }
+                actionsHtml += '<button type="button" class="btn-icon btn-icon-edit" onclick="promptRenameColumn(' + "'"+ col.id +"'" + ')" title="تعديل الاسم"><i class="fa-solid fa-pen"></i></button>';
+                if (col.id !== 'col_day') {
+                    actionsHtml += '<button type="button" class="btn-icon btn-icon-delete" onclick="openDeleteModalForColumn(' + "'"+ col.id +"'" + ', ' + "'"+ escapeHtml(col.name) +"'" + ')" title="حذف العمود"><i class="fa-solid fa-trash"></i></button>';
+                }
+
+                item.innerHTML = '<div class="col-manage-label"><i class="fa-solid fa-table-columns"></i> <span>' + escapeHtml(col.name) + '</span></div><div class="col-manage-actions">' + actionsHtml + '</div>';
+                listContainer.appendChild(item);
+            });
+
+            document.getElementById('manageColumnsModal').classList.add('active');
+        }
+
+        function closeManageColumnsModal() {
+            document.getElementById('manageColumnsModal').classList.remove('active');
+        }
+
+        // Data Loading & Live Sync with Firestore
         async function loadCouncilsData() {
             if (activeBackend === 'firebase' && firestoreDb) {
                 try {
-                    firestoreDb.collection('councils_equipment').onSnapshot((snapshot) => {
+                    firestoreDb.collection('councils_equipment').onSnapshot(async (snapshot) => {
                         const data = [];
                         snapshot.forEach(doc => {
-                            data.push({ id: doc.id, ...doc.data() });
+                            const dData = doc.data();
+                            delete dData.id; // Crucial fix: strip internal 'id' so true Firestore doc.id is used!
+                            data.push({ id: doc.id, ...dData });
                         });
 
-                        const hasEverSynced = localStorage.getItem('has_synced_firestore');
-                        if (data.length > 0 || hasEverSynced) {
-                            councilsData = data;
-                            localStorage.setItem('has_synced_firestore', 'true');
-                            saveToLocalStorage();
-                            updateDashboardStats();
-                            renderTable(getFilteredData());
+                        const isSeeded = localStorage.getItem('is_initial_seeded_v2');
+
+                        if (!isSeeded && snapshot.empty) {
+                            localStorage.setItem('is_initial_seeded_v2', 'true');
+                            for (const item of initialSampleData) {
+                                const cleanItem = { ...item };
+                                delete cleanItem.id;
+                                await firestoreDb.collection('councils_equipment').add(cleanItem);
+                            }
                         } else {
-                            loadFromLocalStorage();
+                            if (!isSeeded) {
+                                localStorage.setItem('is_initial_seeded_v2', 'true');
+                            }
+                            councilsData = data;
+                            saveToLocalStorage();
                         }
+
+                        updateDashboardStats();
+                        renderTable(getFilteredData());
                     }, (err) => {
                         console.warn('Firestore Snapshot listener warning:', err);
                         loadFromLocalStorage();
@@ -1420,23 +1749,16 @@
 
         function loadFromLocalStorage() {
             const stored = localStorage.getItem('councils_equipment_data_v3');
-            const initialized = localStorage.getItem('app_initialized_v3');
-
+            const isSeeded = localStorage.getItem('is_initial_seeded_v2');
             if (stored !== null) {
-                try {
-                    councilsData = JSON.parse(stored);
-                } catch(e) {
-                    councilsData = [];
-                }
-            } else if (!initialized) {
-                // First-time setup only: Load sample data once, then mark as initialized
+                try { councilsData = JSON.parse(stored); } catch(e) { councilsData = []; }
+            } else if (!isSeeded) {
+                localStorage.setItem('is_initial_seeded_v2', 'true');
                 councilsData = [...initialSampleData];
-                localStorage.setItem('app_initialized_v3', 'true');
                 saveToLocalStorage();
             } else {
                 councilsData = [];
             }
-
             updateDashboardStats();
             renderTable(getFilteredData());
         }
@@ -1445,21 +1767,19 @@
             localStorage.setItem('councils_equipment_data_v3', JSON.stringify(councilsData));
         }
 
-        // Stats Cards Calculation
+        // Dashboard Stats Calculation
         function updateDashboardStats() {
-            const totalEl = document.getElementById('statTotalCouncils');
-            if (totalEl) totalEl.textContent = councilsData.length + ' مجلس';
+            document.getElementById('statTotalCouncils').textContent = councilsData.length + ' مجلس';
 
             const uniqueFacilitators = new Set(
-                councilsData.map(c => c.col_facilitator ? String(c.col_facilitator).trim() : '').filter(Boolean)
+                councilsData.map(c => c.col_facilitator ? c.col_facilitator.trim() : '').filter(Boolean)
             );
-            const facEl = document.getElementById('statActiveFacilitators');
-            if (facEl) facEl.textContent = uniqueFacilitators.size + ' منشط';
+            document.getElementById('statActiveFacilitators').textContent = uniqueFacilitators.size + ' منشط';
 
             const locationCounts = {};
             councilsData.forEach(c => {
                 if (c.col_location) {
-                    const loc = String(c.col_location).trim();
+                    const loc = c.col_location.trim();
                     locationCounts[loc] = (locationCounts[loc] || 0) + 1;
                 }
             });
@@ -1472,8 +1792,7 @@
                     topLoc = loc + ' (' + count + ' مجالس)';
                 }
             }
-            const topLocEl = document.getElementById('statTopLocation');
-            if (topLocEl) topLocEl.textContent = topLoc;
+            document.getElementById('statTopLocation').textContent = topLoc;
 
             const daysList = ['all', 'السبت', 'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس'];
             daysList.forEach(day => {
@@ -1494,8 +1813,7 @@
         }
 
         function getFilteredData() {
-            const searchInput = document.getElementById('searchInput');
-            const searchVal = searchInput ? searchInput.value.trim().toLowerCase() : '';
+            const searchVal = document.getElementById('searchInput').value.trim().toLowerCase();
             let result = councilsData;
 
             if (activeDayFilter !== 'all') {
@@ -1521,13 +1839,12 @@
         // Render Data Table Rows with Inline Cell Editing
         function renderTable(dataToRender) {
             const tbody = document.getElementById('tableBody');
-            if (!tbody) return;
             tbody.innerHTML = '';
 
             const colSpanCount = 2 + columnsSchema.length;
 
             if (!dataToRender || dataToRender.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="' + colSpanCount + '"><div class="empty-state"><i class="fa-solid fa-folder-open"></i><p>لا توجد مجالس مطابقة لهذا اليوم أو البحث</p></div></td></tr>';
+                tbody.innerHTML = '<tr><td colspan="' + colSpanCount + '"><div class="empty-state"><i class="fa-solid fa-folder-open"></i><p>لا توجد بيانات مطابقة لهذا اليوم أو البحث</p></div></td></tr>';
                 return;
             }
 
@@ -1574,7 +1891,7 @@
                 // Row action buttons (Edit modal & Delete)
                 const tdActions = document.createElement('td');
                 tdActions.className = 'no-print';
-                tdActions.innerHTML = '<div class="row-actions"><button type="button" class="btn-icon btn-icon-edit" onclick="openEditModal(' + "'"+ item.id +"'" + ')" title="تعديل في نافذة"><i class="fa-solid fa-pen"></i></button><button type="button" class="btn-icon btn-icon-delete" onclick="openDeleteModalForRow(' + "'"+ item.id +"'" + ')" title="حذف المجلس"><i class="fa-solid fa-trash"></i></button></div>';
+                tdActions.innerHTML = '<div class="row-actions"><button type="button" class="btn-icon btn-icon-edit" onclick="openEditModal(' + "'"+ item.id +"'" + ')" title="تعديل في نافذة"><i class="fa-solid fa-pen"></i></button><button type="button" class="btn-icon btn-icon-delete" onclick="openDeleteModalForRow(' + "'"+ item.id +"'" + ')" title="حذف الصف"><i class="fa-solid fa-trash"></i></button></div>';
                 tr.appendChild(tdActions);
 
                 tbody.appendChild(tr);
@@ -1651,13 +1968,12 @@
             const newVal = inputEl.value.trim();
 
             activeEditCell = null;
-            tdElement.classList.remove('is-editing');
 
-            const item = councilsData.find(c => c.id == rowId);
-            if (item) {
-                item[colId] = newVal;
+            const idx = councilsData.findIndex(c => c.id == rowId);
+            if (idx !== -1) {
+                councilsData[idx][colId] = newVal;
 
-                // Sync inline edit to Firestore
+                // Sync directly to Firestore
                 if (activeBackend === 'firebase' && firestoreDb) {
                     try {
                         const updateObj = {};
@@ -1683,7 +1999,6 @@
         // Modal Form Handlers (Add/Edit Row)
         function openAddModal() {
             const formContainer = document.getElementById('modalFormFields');
-            if (!formContainer) return;
             formContainer.innerHTML = '<input type="hidden" id="councilId">';
 
             columnsSchema.forEach(col => {
@@ -1712,7 +2027,6 @@
                     textarea.id = 'field_' + col.id;
                     textarea.className = 'form-control';
                     textarea.placeholder = 'أدخل ' + col.name + '...';
-                    textarea.required = (col.id === 'col_council' || col.id === 'col_facilitator' || col.id === 'col_equipment');
                     div.appendChild(textarea);
                 } else {
                     const input = document.createElement('input');
@@ -1720,19 +2034,13 @@
                     input.id = 'field_' + col.id;
                     input.className = 'form-control';
                     input.placeholder = 'أدخل ' + col.name + '...';
-                    input.required = (col.id === 'col_council' || col.id === 'col_facilitator' || col.id === 'col_location');
                     div.appendChild(input);
                 }
 
                 formContainer.appendChild(div);
             });
 
-            const titleEl = document.getElementById('modalTitle');
-            if (titleEl) titleEl.innerHTML = '<i class="fa-solid fa-plus-circle"></i> <span>إضافة مجلس جديد</span>';
-            const saveBtn = document.getElementById('saveBtn');
-            if (saveBtn) {
-                saveBtn.innerHTML = '<i class="fa-solid fa-plus-circle"></i> <span>إضافة المجلس الآن</span>';
-            }
+            document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-plus"></i> <span>إضافة صف جديد</span>';
             document.getElementById('councilModal').classList.add('active');
         }
 
@@ -1742,12 +2050,7 @@
 
             openAddModal();
             document.getElementById('councilId').value = item.id;
-            const titleEl = document.getElementById('modalTitle');
-            if (titleEl) titleEl.innerHTML = '<i class="fa-solid fa-pen-to-square"></i> <span>تعديل بيانات المجلس</span>';
-            const saveBtn = document.getElementById('saveBtn');
-            if (saveBtn) {
-                saveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> <span>حفظ التعديلات</span>';
-            }
+            document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-pen-to-square"></i> <span>تعديل البيانات</span>';
 
             columnsSchema.forEach(col => {
                 const el = document.getElementById('field_' + col.id);
@@ -1776,42 +2079,41 @@
             });
 
             if (id) {
-                // UPDATE existing council
+                // Update in Firestore
+                if (activeBackend === 'firebase' && firestoreDb) {
+                    try {
+                        const cleanPayload = { ...payload };
+                        delete cleanPayload.id;
+                        await firestoreDb.collection('councils_equipment').doc(id).update(cleanPayload);
+                        showToast('تم تعديل البيانات بنجاح في Firebase!');
+                    } catch(err) {
+                        console.error('Firestore update error:', err);
+                        showToast('تعذر التعديل في Firebase، تم الحفظ محلياً', 'warning');
+                    }
+                }
+
                 const idx = councilsData.findIndex(c => c.id == id);
-                if (idx !== -1) {
-                    councilsData[idx] = { ...councilsData[idx], ...payload };
-                }
-
-                if (activeBackend === 'firebase') {
-                    if (firestoreDb) {
-                        firestoreDb.collection('councils_equipment').doc(id).update(payload).catch(err => {
-                            console.warn('Firestore update sync warning:', err);
-                        });
-                    }
-                    if (realtimeDb) {
-                        realtimeDb.ref('councils_equipment/' + id).update(payload).catch(e => {});
-                    }
-                }
-                showToast('تم تعديل بيانات المجلس بنجاح!');
+                if (idx !== -1) councilsData[idx] = { ...councilsData[idx], ...payload };
             } else {
-                // ADD new council
-                const newId = 'id-' + Date.now();
-                payload.id = newId;
-
-                // Add to local state immediately
-                councilsData.unshift(payload);
-
-                if (activeBackend === 'firebase') {
-                    if (firestoreDb) {
-                        firestoreDb.collection('councils_equipment').doc(newId).set(payload).catch(err => {
-                            firestoreDb.collection('councils_equipment').add(payload).catch(e => console.error(e));
-                        });
+                // Insert into Firestore
+                if (activeBackend === 'firebase' && firestoreDb) {
+                    try {
+                        const cleanPayload = { ...payload };
+                        delete cleanPayload.id;
+                        const docRef = await firestoreDb.collection('councils_equipment').add(cleanPayload);
+                        payload.id = docRef.id;
+                        showToast('تمت إضافة الصف بنجاح في Firebase!');
+                    } catch(err) {
+                        console.error('Firestore add error:', err);
+                        payload.id = 'id-' + Date.now();
+                        councilsData.unshift(payload);
+                        showToast('تعذر الإضافة في Firebase، تم الحفظ محلياً', 'warning');
                     }
-                    if (realtimeDb) {
-                        realtimeDb.ref('councils_equipment/' + newId).set(payload).catch(e => {});
-                    }
+                } else {
+                    payload.id = 'id-' + Date.now();
+                    councilsData.unshift(payload);
+                    showToast('تمت الإضافة بنجاح!');
                 }
-                showToast('تمت إضافة المجلس بنجاح!');
             }
 
             saveToLocalStorage();
@@ -1824,7 +2126,7 @@
         function openDeleteModalForRow(id) {
             document.getElementById('deleteTargetId').value = id;
             document.getElementById('deleteTargetType').value = 'row';
-            document.getElementById('deleteModalText').textContent = 'هل أنت تأكد من رغبتك في حذف بيانات هذا المجلس نهائياً؟ لا يمكن التراجع عن هذا الإجراء.';
+            document.getElementById('deleteModalText').textContent = 'هل أنت تأكد من رغبتك في حذف بيانات هذا الصف؟ لا يمكن التراجع عن هذا الإجراء.';
             document.getElementById('deleteModal').classList.add('active');
         }
 
@@ -1845,203 +2147,33 @@
             if (!targetId) return;
 
             if (targetType === 'row') {
-                // Delete locally immediately
-                councilsData = councilsData.filter(c => c.id != targetId);
-
-                // Delete from Firebase in background
-                if (activeBackend === 'firebase') {
-                    if (firestoreDb) {
-                        firestoreDb.collection('councils_equipment').doc(targetId).delete().catch(err => {
-                            console.warn('Firestore delete warning:', err);
-                        });
-                    }
-                    if (realtimeDb) {
-                        realtimeDb.ref('councils_equipment/' + targetId).remove().catch(e => {});
+                if (activeBackend === 'firebase' && firestoreDb) {
+                    try {
+                        await firestoreDb.collection('councils_equipment').doc(targetId).delete();
+                    } catch(e) {
+                        console.error('Error deleting document from Firestore:', e);
                     }
                 }
-
+                councilsData = councilsData.filter(c => c.id != targetId);
                 saveToLocalStorage();
                 updateDashboardStats();
                 renderTable(getFilteredData());
-                closeDeleteModal();
-                showToast('تم حذف المجلس بنجاح!');
+                showToast('تم حذف الصف بنجاح!');
             } else if (targetType === 'column') {
                 columnsSchema = columnsSchema.filter(c => c.id !== targetId);
-
-                councilsData.forEach(item => {
-                    delete item[targetId];
-                    if (activeBackend === 'firebase' && firestoreDb && item.id) {
-                        const updateObj = {};
-                        updateObj[targetId] = firebase.firestore.FieldValue.delete();
-                        firestoreDb.collection('councils_equipment').doc(item.id).update(updateObj).catch(e => {});
-                    }
-                });
-
-                saveColumnsSchema();
-                saveToLocalStorage();
                 renderTableHeader();
                 renderTable(getFilteredData());
-                closeDeleteModal();
+                await saveColumnsSchemaToFirestore();
+                closeManageColumnsModal();
                 showToast('تم حذف العمود بنجاح!');
             }
+
+            closeDeleteModal();
         }
 
-        // Add Dynamic Custom Column Handlers with Duplicate Prevention
-        function openAddColumnModal() {
-            const inputEl = document.getElementById('newColumnName');
-            if (inputEl) inputEl.value = '';
-            const errDiv = document.getElementById('colAddError');
-            if (errDiv) errDiv.style.display = 'none';
-            document.getElementById('addColumnModal').classList.add('active');
-        }
-
-        function closeAddColumnModal() {
-            document.getElementById('addColumnModal').classList.remove('active');
-        }
-
-        function clearColAddError() {
-            const errDiv = document.getElementById('colAddError');
-            if (errDiv) errDiv.style.display = 'none';
-        }
-
-        function handleAddColumn(e) {
-            e.preventDefault();
-            const colNameInput = document.getElementById('newColumnName');
-            if (!colNameInput) return;
-            const colName = colNameInput.value.trim();
-
-            const typeSelect = document.getElementById('newColumnType');
-            const colType = typeSelect ? typeSelect.value : 'text';
-
-            if (!colName) return;
-
-            // Check if column name already exists (case-insensitive)
-            const exists = columnsSchema.some(c => c.name.toLowerCase() === colName.toLowerCase());
-            if (exists) {
-                const errDiv = document.getElementById('colAddError');
-                if (errDiv) {
-                    errDiv.textContent = 'عنوان العمود "' + colName + '" موجود بالفعل! يرجى إدخال مسمى آخر.';
-                    errDiv.style.display = 'block';
-                }
-                return;
-            }
-
-            const newColId = 'col_' + Date.now();
-            columnsSchema.push({
-                id: newColId,
-                name: colName,
-                type: colType,
-                isDefault: false
-            });
-
-            saveColumnsSchema();
-            renderTableHeader();
-            renderTable(getFilteredData());
-            closeAddColumnModal();
-            showToast('تمت إضافة العمود "' + colName + '" بنجاح!');
-        }
-
-        // Manage Columns Modal & Actions
-        function openManageColumnsModal() {
-            renderManageColumnsList();
-            document.getElementById('manageColumnsModal').classList.add('active');
-        }
-
-        function closeManageColumnsModal() {
-            document.getElementById('manageColumnsModal').classList.remove('active');
-        }
-
-        function renderManageColumnsList() {
-            const listContainer = document.getElementById('manageColumnsList');
-            if (!listContainer) return;
-            listContainer.innerHTML = '';
-
-            columnsSchema.forEach((col, index) => {
-                const div = document.createElement('div');
-                div.style.cssText = 'display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:rgba(4,12,24,0.6); border:1px solid var(--border-soft); border-radius:10px; margin-bottom:8px;';
-                
-                const nameSpan = document.createElement('span');
-                nameSpan.style.cssText = 'font-weight:700; color:var(--gold-light); font-size:0.95rem;';
-                nameSpan.textContent = (index + 1) + '. ' + col.name + (col.isDefault ? ' (أساسي)' : ' (مخصص)');
-                div.appendChild(nameSpan);
-
-                const actionsDiv = document.createElement('div');
-                actionsDiv.style.cssText = 'display:flex; gap:6px; align-items:center;';
-
-                if (index > 0) {
-                    const btnUp = document.createElement('button');
-                    btnUp.type = 'button';
-                    btnUp.className = 'btn-icon';
-                    btnUp.title = 'تحريك لأعلى';
-                    btnUp.innerHTML = '<i class="fa-solid fa-chevron-up"></i>';
-                    btnUp.onclick = () => moveColumn(index, -1);
-                    actionsDiv.appendChild(btnUp);
-                }
-
-                if (index < columnsSchema.length - 1) {
-                    const btnDown = document.createElement('button');
-                    btnDown.type = 'button';
-                    btnDown.className = 'btn-icon';
-                    btnDown.title = 'تحريك لأسفل';
-                    btnDown.innerHTML = '<i class="fa-solid fa-chevron-down"></i>';
-                    btnDown.onclick = () => moveColumn(index, 1);
-                    actionsDiv.appendChild(btnDown);
-                }
-
-                const btnEdit = document.createElement('button');
-                btnEdit.type = 'button';
-                btnEdit.className = 'btn-icon btn-icon-edit';
-                btnEdit.title = 'تعديل المسمى';
-                btnEdit.innerHTML = '<i class="fa-solid fa-pen"></i>';
-                btnEdit.onclick = () => promptRenameColumn(col.id);
-                actionsDiv.appendChild(btnEdit);
-
-                if (!col.isDefault) {
-                    const btnDel = document.createElement('button');
-                    btnDel.type = 'button';
-                    btnDel.className = 'btn-icon btn-icon-delete';
-                    btnDel.title = 'حذف العمود';
-                    btnDel.innerHTML = '<i class="fa-solid fa-trash"></i>';
-                    btnDel.onclick = () => openDeleteModalForColumn(col.id, col.name);
-                    actionsDiv.appendChild(btnDel);
-                }
-
-                div.appendChild(actionsDiv);
-                listContainer.appendChild(div);
-            });
-        }
-
-        function moveColumn(index, direction) {
-            const newIndex = index + direction;
-            if (newIndex < 0 || newIndex >= columnsSchema.length) return;
-
-            const temp = columnsSchema[index];
-            columnsSchema[index] = columnsSchema[newIndex];
-            columnsSchema[newIndex] = temp;
-
-            saveColumnsSchema();
-            renderTableHeader();
-            renderTable(getFilteredData());
-            if (document.getElementById('manageColumnsModal').classList.contains('active')) {
-                renderManageColumnsList();
-            }
-        }
-
-        function promptRenameColumn(colId) {
-            const col = columnsSchema.find(c => c.id === colId);
-            if (!col) return;
-
-            const newName = prompt('أدخل الاسم الجديد للعمود:', col.name);
-            if (newName && newName.trim() !== '') {
-                col.name = newName.trim();
-                saveColumnsSchema();
-                renderTableHeader();
-                renderTable(getFilteredData());
-                if (document.getElementById('manageColumnsModal').classList.contains('active')) {
-                    renderManageColumnsList();
-                }
-                showToast('تم تعديل اسم العمود بنجاح!');
-            }
+        // Official Printing Function
+        function printTable() {
+            window.print();
         }
 
         // Backend Settings Handlers
@@ -2067,7 +2199,6 @@
         function disconnectBackend() {
             localStorage.removeItem('firebase_config');
             firestoreDb = null;
-            realtimeDb = null;
             activeBackend = 'local';
             updateDbStatusUI(false, 'تخزين محلي');
             loadFromLocalStorage();
@@ -2082,13 +2213,13 @@
             const exportContainer = document.getElementById('exportContainer');
             const exportHeader = document.getElementById('exportHeader');
             const exportSubtitle = document.getElementById('exportSubtitle');
-            const noPrintElements = document.querySelectorAll('.no-print');
+            const noExportElements = document.querySelectorAll('.no-export');
 
             const dayLabel = activeDayFilter === 'all' ? 'جميع الأيام' : 'يوم ' + activeDayFilter;
             exportSubtitle.textContent = 'جدول متابعة وتوزيع معدات المنشطين بالمجالس (' + dayLabel + ') — نادي جسور';
 
             exportHeader.style.display = 'block';
-            noPrintElements.forEach(el => el.style.display = 'none');
+            noExportElements.forEach(el => el.style.display = 'none');
 
             try {
                 const canvas = await html2canvas(exportContainer, {
@@ -2111,7 +2242,7 @@
                 showToast('حدث خطأ أثناء تصدير الصورة', 'warning');
             } finally {
                 exportHeader.style.display = 'none';
-                noPrintElements.forEach(el => el.style.display = '');
+                noExportElements.forEach(el => el.style.display = '');
             }
         }
 
