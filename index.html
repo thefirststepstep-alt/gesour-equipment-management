@@ -745,6 +745,14 @@
             flex-direction: column;
         }
 
+        .modal-card form {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+        }
+
         .modal-overlay.active .modal-card {
             transform: scale(1);
         }
@@ -756,6 +764,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-shrink: 0;
         }
 
         .modal-title {
@@ -786,6 +795,7 @@
             flex-direction: column;
             gap: 16px;
             overflow-y: auto;
+            flex: 1;
         }
 
         .form-group {
@@ -834,6 +844,8 @@
             gap: 12px;
             justify-content: flex-end;
             border-top: 1px solid var(--border-soft);
+            background: #081a33;
+            flex-shrink: 0;
         }
 
         /* Toast Notifications */
@@ -1131,7 +1143,7 @@
                 </div>
 
                 <button class="btn btn-primary" onclick="openAddModal()">
-                    <i class="fa-solid fa-plus"></i> إضافة صف
+                    <i class="fa-solid fa-plus-circle"></i> إضافة مجلس جديد
                 </button>
 
                 <button class="btn btn-outline-gold" onclick="openAddColumnModal()">
@@ -1197,7 +1209,7 @@
         <div class="modal-card">
             <div class="modal-header">
                 <h3 class="modal-title" id="modalTitle">
-                    <i class="fa-solid fa-pen-to-square"></i> <span>إضافة صف جديد</span>
+                    <i class="fa-solid fa-plus-circle"></i> <span>إضافة مجلس جديد</span>
                 </h3>
                 <button class="close-modal" type="button" onclick="closeCouncilModal()">
                     <i class="fa-solid fa-xmark"></i>
@@ -1211,7 +1223,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="closeCouncilModal()">إلغاء</button>
                     <button type="submit" class="btn btn-primary" id="saveBtn">
-                        <i class="fa-solid fa-floppy-disk"></i> حفظ البيانات
+                        <i class="fa-solid fa-plus-circle"></i> <span>تأكيد وإضافة المجلس</span>
                     </button>
                 </div>
             </form>
@@ -2056,8 +2068,17 @@
                 formContainer.appendChild(div);
             });
 
-            document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-plus"></i> <span>إضافة صف جديد</span>';
+            document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-plus-circle" style="color:var(--gold-light);"></i> <span>إضافة مجلس جديد</span>';
+            const saveBtn = document.getElementById('saveBtn');
+            if (saveBtn) {
+                saveBtn.innerHTML = '<i class="fa-solid fa-plus-circle"></i> <span>تأكيد وإضافة المجلس</span>';
+                saveBtn.className = 'btn btn-primary';
+            }
             document.getElementById('councilModal').classList.add('active');
+            setTimeout(() => {
+                const firstInput = document.getElementById('field_' + (columnsSchema[1] ? columnsSchema[1].id : 'col_council'));
+                if (firstInput) firstInput.focus();
+            }, 100);
         }
 
         function openEditModal(id) {
@@ -2066,7 +2087,11 @@
 
             openAddModal();
             document.getElementById('councilId').value = item.id;
-            document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-pen-to-square"></i> <span>تعديل البيانات</span>';
+            document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-pen-to-square" style="color:var(--gold-light);"></i> <span>تعديل بيانات المجلس</span>';
+            const saveBtn = document.getElementById('saveBtn');
+            if (saveBtn) {
+                saveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> <span>حفظ وتأكيد التعديل</span>';
+            }
 
             columnsSchema.forEach(col => {
                 const el = document.getElementById('field_' + col.id);
@@ -2082,7 +2107,7 @@
 
         // Form Submission logic for Row Add / Edit
         async function handleFormSubmit(e) {
-            e.preventDefault();
+            if (e && e.preventDefault) e.preventDefault();
 
             const id = document.getElementById('councilId').value;
             const payload = {};
@@ -2118,7 +2143,7 @@
                         delete cleanPayload.id;
                         const docRef = await firestoreDb.collection('councils_equipment').add(cleanPayload);
                         payload.id = docRef.id;
-                        showToast('تمت إضافة الصف بنجاح في Firebase!');
+                        showToast('تمت إضافة المجلس بنجاح في Firebase!');
                     } catch(err) {
                         console.error('Firestore add error:', err);
                         payload.id = 'id-' + Date.now();
@@ -2128,7 +2153,7 @@
                 } else {
                     payload.id = 'id-' + Date.now();
                     councilsData.unshift(payload);
-                    showToast('تمت الإضافة بنجاح!');
+                    showToast('تمت إضافة المجلس بنجاح!');
                 }
             }
 
