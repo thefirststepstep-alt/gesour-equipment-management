@@ -376,6 +376,18 @@
             box-shadow: 0 6px 20px rgba(14, 165, 233, 0.4);
         }
 
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #f87171 0%, #dc2626 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+        }
+
         .btn-secondary {
             background: rgba(255, 255, 255, 0.08);
             color: var(--text-light);
@@ -1128,6 +1140,10 @@
 
                 <button class="btn btn-secondary" onclick="openManageColumnsModal()">
                     <i class="fa-solid fa-sliders"></i> إدارة الأعمدة
+                </button>
+
+                <button class="btn btn-danger" onclick="openDeleteAllRowsModal()" title="حذف كافة صفوف الجدول">
+                    <i class="fa-solid fa-trash-can"></i> مسح جميع الصفوف
                 </button>
 
                 <button class="btn btn-info" onclick="printTable()">
@@ -2122,7 +2138,7 @@
             closeCouncilModal();
         }
 
-        // Deletion Modals for Row & Column
+        // Deletion Modals for Single Row, Column, or All Rows
         function openDeleteModalForRow(id) {
             document.getElementById('deleteTargetId').value = id;
             document.getElementById('deleteTargetType').value = 'row';
@@ -2137,6 +2153,17 @@
             document.getElementById('deleteModal').classList.add('active');
         }
 
+        function openDeleteAllRowsModal() {
+            if (councilsData.length === 0) {
+                showToast('الجدول فارغ بالفعل! لا توجد صفوف للحذف.', 'warning');
+                return;
+            }
+            document.getElementById('deleteTargetId').value = 'ALL';
+            document.getElementById('deleteTargetType').value = 'all_rows';
+            document.getElementById('deleteModalText').innerHTML = '⚠️ <b style="color:#ef4444;">تحذير هام جداً:</b><br>هل أنت متأكد من رغبتك في مسح <b>كافة الصفوف (' + councilsData.length + ' صف)</b> من الجدول؟<br><br>سيتم مسح كافة البيانات بشكل دائم من قاعدة البيانات والتخزين المحلي ولا يمكن التراجع عن هذا الإجراء.';
+            document.getElementById('deleteModal').classList.add('active');
+        }
+
         function closeDeleteModal() {
             document.getElementById('deleteModal').classList.remove('active');
         }
@@ -2144,9 +2171,27 @@
         async function confirmDeleteAction() {
             const targetId = document.getElementById('deleteTargetId').value;
             const targetType = document.getElementById('deleteTargetType').value;
-            if (!targetId) return;
 
-            if (targetType === 'row') {
+            if (targetType === 'all_rows') {
+                if (activeBackend === 'firebase' && firestoreDb) {
+                    try {
+                        const snapshot = await firestoreDb.collection('councils_equipment').get();
+                        const batch = firestoreDb.batch();
+                        snapshot.forEach(doc => {
+                            batch.delete(doc.ref);
+                        });
+                        await batch.commit();
+                    } catch(e) {
+                        console.error('Error deleting all rows from Firestore:', e);
+                    }
+                }
+                councilsData = [];
+                saveToLocalStorage();
+                updateDashboardStats();
+                renderTable(getFilteredData());
+                showToast('تم مسح جميع الصفوف بنجاح!');
+            } else if (targetType === 'row') {
+                if (!targetId) return;
                 if (activeBackend === 'firebase' && firestoreDb) {
                     try {
                         await firestoreDb.collection('councils_equipment').doc(targetId).delete();
@@ -2160,6 +2205,7 @@
                 renderTable(getFilteredData());
                 showToast('تم حذف الصف بنجاح!');
             } else if (targetType === 'column') {
+                if (!targetId) return;
                 columnsSchema = columnsSchema.filter(c => c.id !== targetId);
                 renderTableHeader();
                 renderTable(getFilteredData());
